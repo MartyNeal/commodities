@@ -32,7 +32,7 @@ int generateTradeData(commod comCommodity, double** padLow, double** padHigh, do
     double** padClose, char*** paszDates, int* piSize);
 
 int generateChannels(commod comCommodity, double* adLow, double* adHigh, int iEntryWindow,
-    int iTrailStopWindow, int iStopLossWindow, double** padEntryChannel, double** padTrailStopChannel,
+                     int iTrailStopWindow, int iStopLossWindow, int iSize, double** padEntryChannel, double** padTrailStopChannel,
     double** padStopLossChannel);
 
 #endif
