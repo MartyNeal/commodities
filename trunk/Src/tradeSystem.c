@@ -111,6 +111,20 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         return iError;
     }
 
+    printf("Date\t Open\tHigh\tLow\tClose\tEntry\tTrail\tStop\n");
+    for(i = 0; i < iSize; i++)
+    {
+        printf("%s %.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\n",
+               aszDates[i],
+               adOpen[i],
+               adHigh[i],
+               adLow[i],
+               adClose[i],
+               adEntryChannel[i],
+               adTrailStopChannel[i],
+               adStopLossChannel[i]);
+    }
+
     //calculate the start day
     t = computeStartDay(iEntryWindow, iTrailStopWindow, iStopLossWindow);
 
@@ -242,7 +256,7 @@ int nameLookup(char* szName)
 
     while((iKey == ERRVAL) && (i < NUMCOMMODS))
     {
-        if(strncmp(szName, comDatabase[i].szName, MAX_NAME_LEN == 0))
+        if(strncmp(szName, comDatabase[i].szName, MAX_NAME_LEN) == 0)
             iKey = i;
         i++;
     }
