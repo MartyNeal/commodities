@@ -76,6 +76,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     int iError;
     int iExit;
     int t;
+    int i;
     int fStartDayOn = 0; //we aren't on at the start of the day yet
 
     double dEntryPoints = 0;
@@ -164,6 +165,11 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
 
     //compute profit!
     dProfit = computeProfit(dEntryPoints, dExitPoints, comCommodity.dTickVal, comCommodity.dTickSize);
+
+    for (i = 0; i < iSize; i++)
+    {
+        if(aszDates[i] != NULL) free(aszDates[i]);
+    }
 
     free(adOpen);
     free(adClose);

@@ -17,6 +17,7 @@
 #define MAX_NAME_LEN 6
 #define DATE_LEN 8
 #define FORCEDEXIT 2
+#define ERRVAL -1
 
 typedef struct commodity
 {
