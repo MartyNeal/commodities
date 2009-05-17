@@ -54,7 +54,7 @@ double computeExitPoints(int iType, double dTickSize, double dStopLoss, double d
 // Computes the exit points by comparing open to the closer of the stop loss and the
 // trail stop.
 
-double computeProfit(double dEntryPoints, double dExitPoints, double dTickVal, double dTickSize);
+double computeProfit(int iType, double dEntryPoints, double dExitPoints, double dTickVal, double dTickSize);
 // Computes the total profit earned.
 
 /* ----------------------------- trade system functions --------------------------- */
@@ -185,7 +185,8 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         fprintf(stderr, "tradeSystem: Never exited final trade\n");
 
     //compute profit!
-    dProfit = computeProfit(dEntryPoints, dExitPoints, comCommodity.dTickVal, comCommodity.dTickSize);
+    dProfit = computeProfit(comCommodity.iType, dEntryPoints, dExitPoints, 
+        comCommodity.dTickVal, comCommodity.dTickSize);
 
     //free everything!
     for (i = 0; i < iSize; i++)
@@ -454,9 +455,12 @@ double computeExitPoints(int iType, double dTickSize, double dStopLoss, double d
     return dPoints;
 }
 
-double computeProfit(double dEntryPoints, double dExitPoints, double dTickVal, double dTickSize)
+double computeProfit(int iType, double dEntryPoints, double dExitPoints, double dTickVal, double dTickSize)
 {
     // Computes the total profit earned.
 
-    return (dExitPoints - dEntryPoints) * dTickVal/dTickSize;
+    if(iType == LONG)
+        return (dExitPoints - dEntryPoints) * dTickVal/dTickSize;
+    else
+        return (dEntryPoints - dExitPoints) * dTickVal/dTickSize;
 }
