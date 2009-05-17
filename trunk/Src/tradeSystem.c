@@ -19,14 +19,17 @@ extern commod comDatabase[NUMCOMMODS];
 /* ------------------------------- utility prototypes ---------------------------- */
 
 int nameLookup(char* szName);
-// Returns the key into the database for this name, or -1 if the key doesn't exist.
+// Returns the key into the database for this name, or ERRVAL if the key doesn't exist.
 
 int lookupTypeTick(commod* pcomCommod);
 // Looks up the type, tick size and tick value for this commodity. Returns 0 on
-// success; -1, if the commodity was not found.
+// success; ERRVAL, if the commodity was not found.
 
 int computeStartDay(int iWinA, int iWinB, int iWinC);
 // Computes the start day to be the maximum of the three windows.
+
+int checkForNAValues(int t, double* adEntryChannel, double* adTrailStopChannel, double* adStopLossChannel);
+// Checks for NA values in the channels, past the start day.
 
 int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate,
     char* szNoEntryDate, char* szCurrDate);
@@ -89,16 +92,16 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     comCommodity.szName = szName;
     comCommodity.iYear = iYear;
     iError = lookupTypeTick(&comCommodity);
-    if(iError) return iError;
+    if(iError == ERRVAL) return iError;
 
     //get trade data
     iError = generateTradeData(comCommodity, &adLow, &adHigh, &adOpen, &adClose, &aszDates, &iSize);
-    if(iError) return iError;
+    if(iError == ERRVAL) return iError;
 
     //get channels
     iError = generateChannels(comCommodity, adLow, adHigh, iEntryWindow, iTrailStopWindow, iStopLossWindow,
-                              iSize, &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
-    if(iError)
+        iSize, &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
+    if(iError == ERRVAL)
     {
         free(adLow);
         free(adHigh);
@@ -113,49 +116,53 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
 
     while(!fDone && t < iSize)
     {
-            //if we haven't entered
-            if(!fStartDayOn)
-            {
-                //check if we should enter
-                if(checkEnter(comCommodity.iType, adEntryChannel[t-1], adLow[t], adHigh[t], szEntryDate,
-                    szNoEntryDate, aszDates[t]))
-                {
-                    //set flag to on, compute entry price and stop loss
-                    fStartDayOn = 1;
-                    dEntryPoints += computeEntryPoints(comCommodity.iType, comCommodity.dTickSize,
-                        adEntryChannel[t-1], adOpen[t]);
-                    dStopLoss = adStopLossChannel[t-1];
-                }
+        //check for NA values
+        iError = checkForNAValues(t, adEntryChannel, adTrailStopChannel, adStopLossChannel);
+        if(iError == ERRVAL) return iError;
 
-                //if we didn't enter
-                else
-                {
-                    //set done flag, if past entry window
-                    if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
-                        fDone = 1;
-                }
+        //if we haven't entered
+        if(!fStartDayOn)
+        {
+            //check if we should enter
+            if(checkEnter(comCommodity.iType, adEntryChannel[t-1], adLow[t], adHigh[t], szEntryDate,
+                szNoEntryDate, aszDates[t]))
+            {
+                //set flag to on, compute entry price and stop loss
+                fStartDayOn = 1;
+                dEntryPoints += computeEntryPoints(comCommodity.iType, comCommodity.dTickSize,
+                    adEntryChannel[t-1], adOpen[t]);
+                dStopLoss = adStopLossChannel[t-1];
             }
 
-            //if we have entered
+            //if we didn't enter
             else
             {
-                iExit = checkExit(comCommodity.iType, dStopLoss, adTrailStopChannel[t-1],
-                    adLow[t], adHigh[t], szExitDate, aszDates[t]);
-
-                //check if we should exit
-                if(iExit)
-                {
-                    //set flag to off, compute exit price
-                    fStartDayOn = 0;
-                    dExitPoints += computeExitPoints(comCommodity.iType, comCommodity.dTickSize,
-                        dStopLoss, adTrailStopChannel[t-1], adOpen[t], adClose[t], iExit);
-
-                    //set done flag, if past entry window
-                    if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
-                        fDone = 1;
-                }
-
+                //set done flag, if past entry window
+                if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
+                    fDone = 1;
             }
+        }
+
+        //if we have entered
+        else
+        {
+            iExit = checkExit(comCommodity.iType, dStopLoss, adTrailStopChannel[t-1],
+                adLow[t], adHigh[t], szExitDate, aszDates[t]);
+
+            //check if we should exit
+            if(iExit)
+            {
+                //set flag to off, compute exit price
+                fStartDayOn = 0;
+                dExitPoints += computeExitPoints(comCommodity.iType, comCommodity.dTickSize,
+                    dStopLoss, adTrailStopChannel[t-1], adOpen[t], adClose[t], iExit);
+
+                //set done flag, if past entry window
+                if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
+                    fDone = 1;
+            }
+
+        }
 
         t++;
     }
@@ -166,6 +173,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     //compute profit!
     dProfit = computeProfit(dEntryPoints, dExitPoints, comCommodity.dTickVal, comCommodity.dTickSize);
 
+    //free everything!
     for (i = 0; i < iSize; i++)
     {
         if(aszDates[i] != NULL) free(aszDates[i]);
@@ -198,11 +206,11 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
     if(dPercentData < 0 || dPercentData > 1)
     {
         fprintf(stderr, "tradeSystem: Invalid data percentage\n");
-        return -1;
+        return ERRVAL;
     }
 
     iKey = nameLookup(szName);
-    if(iKey < 0) return -1;
+    if(iKey < 0) return ERRVAL;
 
     iBaseYear = comDatabase[iKey].iYear;
     iTotalYears = comDatabase[iKey].iNumYears;
@@ -223,22 +231,23 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
 
 /* -------------------------------- utility functions ---------------------------- */
 
+
 int nameLookup(char* szName)
 {
-    // Returns the key into the database for this name, or -1 if the key doesn't
+    // Returns the key into the database for this name, or ERRVAL if the key doesn't
     // exist.
 
     int i = 0;
-    int iKey = -1;
+    int iKey = ERRVAL;
 
-    while((iKey == -1) && (i < NUMCOMMODS))
+    while((iKey == ERRVAL) && (i < NUMCOMMODS))
     {
         if(strncmp(szName, comDatabase[i].szName, MAX_NAME_LEN == 0))
             iKey = i;
         i++;
     }
 
-    if(iKey == -1)
+    if(iKey == ERRVAL)
         fprintf(stderr, "tradeSystem: No such commodity\n");
 
     return iKey;
@@ -247,7 +256,7 @@ int nameLookup(char* szName)
 int lookupTypeTick(commod* pcomCommod)
 {
     // Looks up the type, tick size and tick value for this commodity. Returns 0
-    // on success; -1, if the commodity was not found.
+    // on success; ERRVAL, if the commodity was not found.
 
     int iKey = nameLookup(pcomCommod->szName);
     if(iKey < 0) return iKey;
@@ -273,6 +282,21 @@ int computeStartDay(int iWinA, int iWinB, int iWinC)
         if(iWinB >= iWinC) return iWinB;
         else return iWinC;
     }
+}
+
+int checkForNAValues(int t, double* adEntryChannel, double* adTrailStopChannel, double* adStopLossChannel)
+{
+    // Checks for NA values in the channels, past the start day.
+
+    int iErr = 0;
+
+    if(adEntryChannel[t-1] == ERRVAL || adTrailStopChannel[t-1] == ERRVAL || adStopLossChannel[t-1] == ERRVAL)
+    {
+        iErr = ERRVAL;
+        printf("tradeSystem: found an NA value where there shouldn't be one.\n");
+    }
+
+    return iErr;
 }
 
 int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate, char* szNoEntryDate,
