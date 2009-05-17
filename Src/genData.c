@@ -315,21 +315,21 @@ int generateChannels(commod comCommodity,
     *padTrailStopChannel = NULL;
     *padStopLossChannel = NULL;
 
-    if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double*)))))
+    if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double)))))
     {
         error(0,0,"malloc *padEntryChannel failed");
         iRet = ERRVAL;
         goto exit;
     }
 
-    if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double*)))))
+    if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double)))))
     {
         error(0,0,"malloc *padTrailStopChannel failed");
         iRet = ERRVAL;
         goto exit;
     }
 
-    if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double*)))))
+    if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double)))))
     {
         error(0,0,"malloc *padStopLossChannel failed");
         iRet = ERRVAL;
