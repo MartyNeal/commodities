@@ -28,10 +28,10 @@ int lookupTypeTick(commod* pcomCommod);
 int computeStartDay(int iWinA, int iWinB, int iWinC);
 // Computes the start day to be the maximum of the three windows.
 
-int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate, 
+int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate,
     char* szNoEntryDate, char* szCurrDate);
-// Determines whether we should enter the trade. Checks if we're within the entry 
-// window. Compares the entry channel with the low if we are selling short. 
+// Determines whether we should enter the trade. Checks if we're within the entry
+// window. Compares the entry channel with the low if we are selling short.
 // Compares the entry channel with the high if we are selling long.
 
 int inEntryWindow(char* szEntryDate, char* szNoEntryDate, char* szCurrDate);
@@ -42,13 +42,13 @@ double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double
 
 int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, double dHigh,
     char* szExitDate, char* szCurrDate);
-// Determines whether we should exit the trade. Checks if we've passed the exit date. 
-// Compares the closer of the trail stop and stop loss with the high if we're selling 
-// short; and with the low if we're selling long. 
+// Determines whether we should exit the trade. Checks if we've passed the exit date.
+// Compares the closer of the trail stop and stop loss with the high if we're selling
+// short; and with the low if we're selling long.
 
-double computeExitPoints(int iType, double dTickSize, double dStopLoss, double dTrailStop, 
+double computeExitPoints(int iType, double dTickSize, double dStopLoss, double dTrailStop,
     double dOpen, double dClose, int iExit);
-// Computes the exit points by comparing open to the closer of the stop loss and the 
+// Computes the exit points by comparing open to the closer of the stop loss and the
 // trail stop.
 
 double computeProfit(double dEntryPoints, double dExitPoints, double dTickVal, double dTickSize);
@@ -56,7 +56,7 @@ double computeProfit(double dEntryPoints, double dExitPoints, double dTickVal, d
 
 /* ----------------------------- trade system functions --------------------------- */
 
-double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWindow, 
+double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWindow,
     int iStopLossWindow, char* szEntryDate, char* szNoEntryDate, char* szExitDate)
 {
 
@@ -70,7 +70,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     double* adEntryChannel;
     double* adTrailStopChannel;
     double* adStopLossChannel;
-    
+
     commod comCommodity;
     int fDone = 0;
     int iError;
@@ -89,15 +89,15 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     comCommodity.iYear = iYear;
     iError = lookupTypeTick(&comCommodity);
     if(iError) return iError;
-    
+
     //get trade data
     iError = generateTradeData(comCommodity, &adLow, &adHigh, &adOpen, &adClose, &aszDates, &iSize);
     if(iError) return iError;
 
     //get channels
     iError = generateChannels(comCommodity, adLow, adHigh, iEntryWindow, iTrailStopWindow, iStopLossWindow,
-        &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
-    if(iError) 
+                              iSize, &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
+    if(iError)
     {
         free(adLow);
         free(adHigh);
@@ -109,7 +109,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
 
     //calculate the start day
     t = computeStartDay(iEntryWindow, iTrailStopWindow, iStopLossWindow);
-    
+
     while(!fDone && t < iSize)
     {
             //if we haven't entered
@@ -117,12 +117,12 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
             {
                 //check if we should enter
                 if(checkEnter(comCommodity.iType, adEntryChannel[t-1], adLow[t], adHigh[t], szEntryDate,
-                    szNoEntryDate, aszDates[t])) 
+                    szNoEntryDate, aszDates[t]))
                 {
                     //set flag to on, compute entry price and stop loss
                     fStartDayOn = 1;
-                    dEntryPoints += computeEntryPoints(comCommodity.iType, comCommodity.dTickSize, 
-                        adEntryChannel[t-1], adOpen[t]);                    
+                    dEntryPoints += computeEntryPoints(comCommodity.iType, comCommodity.dTickSize,
+                        adEntryChannel[t-1], adOpen[t]);
                     dStopLoss = adStopLossChannel[t-1];
                 }
 
@@ -137,12 +137,12 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
 
             //if we have entered
             else
-            {  
-                iExit = checkExit(comCommodity.iType, dStopLoss, adTrailStopChannel[t-1], 
+            {
+                iExit = checkExit(comCommodity.iType, dStopLoss, adTrailStopChannel[t-1],
                     adLow[t], adHigh[t], szExitDate, aszDates[t]);
 
                 //check if we should exit
-                if(iExit) 
+                if(iExit)
                 {
                     //set flag to off, compute exit price
                     fStartDayOn = 0;
@@ -177,7 +177,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     return dProfit;
 }
 
-double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int iTrailStopWindow,         
+double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int iTrailStopWindow,
     int iStopLossWindow, char* szEntryDate, char* szNoEntryDate, char* szExitDate)
 {
 
@@ -202,7 +202,7 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
     iTotalYears = comDatabase[iKey].iNumYears;
 
     iNumYears = iTotalYears * dPercentData;
-    
+
     for(i = 0; i < iNumYears; i++)
     {
         iYear = iBaseYear + i;
@@ -240,7 +240,7 @@ int nameLookup(char* szName)
 
 int lookupTypeTick(commod* pcomCommod)
 {
-    // Looks up the type, tick size and tick value for this commodity. Returns 0 
+    // Looks up the type, tick size and tick value for this commodity. Returns 0
     // on success; -1, if the commodity was not found.
 
     int iKey = nameLookup(pcomCommod->szName);
@@ -269,16 +269,16 @@ int computeStartDay(int iWinA, int iWinB, int iWinC)
     }
 }
 
-int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate, char* szNoEntryDate, 
+int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* szEntryDate, char* szNoEntryDate,
     char* szCurrDate)
 {
     // Determines whether we should enter the trade. Checks if we're
-    // within the entry window. Compares the entry channel with the 
-    // low if we are selling short. Compares the entry channel with 
+    // within the entry window. Compares the entry channel with the
+    // low if we are selling short. Compares the entry channel with
     // the high if we are selling long.
-    
+
     if(inEntryWindow(szEntryDate, szNoEntryDate, szCurrDate))
-    {    
+    {
         //for short, compare low to entry channel
         if(iType == SHORT)
         {
@@ -310,9 +310,9 @@ int inEntryWindow(char* szEntryDate, char* szNoEntryDate, char* szCurrDate)
 
 double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double dOpen)
 {
-    // Computes the entry points, by comparing the open and entryChannel 
+    // Computes the entry points, by comparing the open and entryChannel
     // values.
-    
+
     double dPoints;
 
     //compute short entry points
@@ -332,13 +332,13 @@ double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double
     return dPoints;
 }
 
-int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, double dHigh, 
+int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, double dHigh,
     char* szExitDate, char* szCurrDate)
 {
     // Determines whether we should exit the trade. Checks if we've
     // passed the exit date. Compares the closer of the trail stop
     // and stop loss with the high if we're selling short; and with
-    // the low if we're selling long. 
+    // the low if we're selling long.
 
     double dCloser;
 
@@ -361,7 +361,7 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
         {
             if(dStopLoss > dTrailStop) dCloser = dStopLoss;
             else dCloser = dTrailStop;
-        
+
             if(dLow < dCloser) return 1; //exit
             else return 0; //do not exit
         }
@@ -369,7 +369,7 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
 
 }
 
-double computeExitPoints(int iType, double dTickSize, double dStopLoss, double dTrailStop, 
+double computeExitPoints(int iType, double dTickSize, double dStopLoss, double dTrailStop,
     double dOpen, double dClose, int iExit)
 {
     // Computes the exit points by comparing open to the closer of the
@@ -382,10 +382,10 @@ double computeExitPoints(int iType, double dTickSize, double dStopLoss, double d
     if(iExit == FORCEDEXIT)
         dPoints = dClose;
 
-    //else compute exit points 
+    //else compute exit points
     else
     {
-        //compute short exit points 
+        //compute short exit points
         if(iType == SHORT)
         {
             if(dStopLoss < dTrailStop) dCloser = dStopLoss;
@@ -415,5 +415,3 @@ double computeProfit(double dEntryPoints, double dExitPoints, double dTickVal, d
 
     return (dExitPoints - dEntryPoints) * dTickVal/dTickSize;
 }
-
-
