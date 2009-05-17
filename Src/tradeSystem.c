@@ -182,7 +182,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     }
 
     if(!fDone)
-        fprintf(stderr, "tradeSystem: Never exited final trade\n");
+        fprintf(stderr, "tradeSystem: Never exited final trade (or entry window is still open!)\n");
 
     //compute profit!
     dProfit = computeProfit(comCommodity.iType, dEntryPoints, dExitPoints, 
@@ -233,9 +233,14 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
 
     iNumYears = iTotalYears * dPercentData;
 
+    printf("total years for %s: %d\n", szName, iTotalYears);
+    printf("percentage requested: %lf, years computed: %d", dPercentData, iNumYears);
+
     for(i = 0; i < iNumYears; i++)
     {
         iYear = iBaseYear + i;
+
+        printf("calling tradeSystem with year: %d\n", iYear);
 
         dTotalProfit += tradeSystem(szName, iYear, iEntryWindow, iTrailStopWindow,
             iStopLossWindow, szEntryDate, szNoEntryDate, szExitDate);
