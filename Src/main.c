@@ -26,6 +26,7 @@ int main(int argc, char** argv)
     }
 
     szName = (char*) argv[1];
+    dPercent = atof(argv[2]);
     iYear = atoi(argv[2]);
     iEntryWindow = atoi(argv[3]);
     iTrailStopWindow = atoi(argv[4]);
@@ -34,8 +35,18 @@ int main(int argc, char** argv)
     szNoEntryDate = (char*) argv[7];
     szExitDate = (char*) argv[8];
 
-    dProfit = tradeSystem(szName, iYear, iEntryWindow, iTrailStopWindow, iStopLossWindow,
-        szEntryDate, szNoEntryDate, szExitDate);
+    if(dPercent <= 1 && dPercent >= 0) //assume percentage
+    {
+        printf("Percent value in correct range, calling tradeSystemData -----------\n");
+        dProfit = tradeSystemData(szName, dPercent, iEntryWindow, iTrailStopWindow, iStopLossWindow,
+            szEntryDate, szNoEntryDate, szExitDate);
+    }
+    else
+    {
+        printf("Calling tradeSystem -----------------------------------------------\n");
+        dProfit = tradeSystem(szName, iYear, iEntryWindow, iTrailStopWindow, iStopLossWindow,
+            szEntryDate, szNoEntryDate, szExitDate);
+    }
 
     printf("in main.c ------------------------\n");
 
