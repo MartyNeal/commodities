@@ -44,7 +44,7 @@ double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double
 // Computes the entry price, by comparing the open and entryChannel values.
 
 int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, double dHigh,
-    char* szExitDate, char* szCurrDate);
+    char* szExitDate, char* szCurrDate, double dEntryPoints);
 // Determines whether we should exit the trade. Checks if we've passed the exit date.
 // Compares the closer of the trail stop and stop loss with the high if we're selling
 // short; and with the low if we're selling long.
@@ -161,7 +161,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         else
         {
             iExit = checkExit(comCommodity.iType, dStopLoss, adTrailStopChannel[t-1],
-                adLow[t], adHigh[t], szExitDate, aszDates[t]);
+                adLow[t], adHigh[t], szExitDate, aszDates[t], dEntryPoints);
 
             //check if we should exit
             if(iExit)
@@ -379,7 +379,7 @@ double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double
 }
 
 int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, double dHigh,
-    char* szExitDate, char* szCurrDate)
+    char* szExitDate, char* szCurrDate, double dEntryPoints)
 {
     // Determines whether we should exit the trade. Checks if we've
     // passed the exit date. Compares the closer of the trail stop
@@ -403,7 +403,7 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
             else 
             {
                 //do not exit due to trailStop, cause we'd lose money
-                if(dTrailStop > dEntryPrice)
+                if(dTrailStop > dEntryPoints)
                     return 0; //do not exit
 
                 //otherwise, check as normal
@@ -424,7 +424,7 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
             else
             {
                 //do note exit due to trailStop, cause we'd lose money
-                if(dTrailStop < dEntryPrice)
+                if(dTrailStop < dEntryPoints)
                     return 0; //do not exit
 
                 //otherwise, check as normal
