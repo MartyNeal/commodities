@@ -15,12 +15,15 @@
 #define SHORT 0
 #define LONG 1
 #define MAX_NAME_LEN 6
+#define DATE_LEN 8
+#define FORCEDEXIT 2
 
 typedef struct commodity
 {
     char* szName;
     int iType;
     int iYear;
+    int iNumYears;
     double dTickVal;
     double dTickSize;
 } commod;
