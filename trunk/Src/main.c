@@ -25,10 +25,10 @@ int main(int argc, char** argv)
     }
 
     szName = (char*) argv[1];
-    iYear = (int) argv[2];
-    iEntryWindow = (int) argv[3];
-    iTrailStopWindow = (int) argv[4];
-    iStopLossWindow = (int) argv[5];
+    iYear = atoi(argv[2]);
+    iEntryWindow = atoi(argv[3]);
+    iTrailStopWindow = atoi(argv[4]);
+    iStopLossWindow = atoi(argv[5]);
     szEntryDate = (char*) argv[6];
     szNoEntryDate = (char*) argv[7];
     szExitDate = (char*) argv[8];
