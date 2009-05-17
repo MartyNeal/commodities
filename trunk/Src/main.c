@@ -7,6 +7,7 @@
 int main(int argc, char** argv)
 {
     char* szName;
+    double dPercent;
     int iYear;
     int iEntryWindow;
     int iTrailStopWindow;
@@ -19,8 +20,8 @@ int main(int argc, char** argv)
 
     if(argc != NUMARGS)
     {
-        fprintf(stderr, "Usage: %s <commodity name> <year> <entry window> <trail stop window> \
-            <stop loss window> <entry date> <no entry date> <exit date>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <commodity name> <year | percent> <entry window> <trail stop window> " 
+            "<stop loss window>\n\t<entry date> <no entry date> <exit date>\n", argv[0]);
         exit(1);
     }
 

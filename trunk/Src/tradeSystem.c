@@ -395,8 +395,20 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
         //if short compare high to closer
         if(iType == SHORT)
         {
-            if(dStopLoss < dTrailStop) dCloser = dStopLoss;
-            else dCloser = dTrailStop;
+            //may exit due to stoploss
+            if(dStopLoss < dTrailStop) 
+                dCloser = dStopLoss;
+
+            //may exit due to trailStop
+            else 
+            {
+                //do not exit due to trailStop, cause we'd lose money
+                if(dTrailStop > dEntryPrice)
+                    return 0; //do not exit
+
+                //otherwise, check as normal
+                dCloser = dTrailStop;
+            }
 
             if(dHigh > dCloser) return 1; //exit
             else return 0; //do not exit
@@ -404,9 +416,20 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
 
         //if long compare low to closer
         else
-        {
-            if(dStopLoss > dTrailStop) dCloser = dStopLoss;
-            else dCloser = dTrailStop;
+        {   //may exit due to stoploss
+            if(dStopLoss > dTrailStop)
+                dCloser = dStopLoss;
+
+            //may exit due to trailStop
+            else
+            {
+                //do note exit due to trailStop, cause we'd lose money
+                if(dTrailStop < dEntryPrice)
+                    return 0; //do not exit
+
+                //otherwise, check as normal
+                dCloser = dTrailStop;
+            }
 
             if(dLow < dCloser) return 1; //exit
             else return 0; //do not exit
