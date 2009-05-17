@@ -36,6 +36,8 @@ int main(int argc, char** argv)
     dProfit = tradeSystem(szName, iYear, iEntryWindow, iTrailStopWindow, iStopLossWindow,
         szEntryDate, szNoEntryDate, szExitDate);
 
+    printf("in main.c ------------------------\n");
+
     printf("commodity name: %s\nyear: %d\nentry window: %d\n", szName, iYear, iEntryWindow);
     printf("trail stop window: %d\nstop loss window: %d\n", iTrailStopWindow, iStopLossWindow);
     printf("entry date: %s\nno entry date: %s\nexit date: %s\n", szEntryDate, szNoEntryDate, szExitDate);

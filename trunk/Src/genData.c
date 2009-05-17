@@ -146,7 +146,6 @@ int generateTradeData(commod comCommodity,
         goto exit;
     }
 
-    printf("Got here\n");
     //before entering our main loop, consume the header
     for (cbLeftover = 0; cbLeftover < cbBytesReturned; cbLeftover++)
     {

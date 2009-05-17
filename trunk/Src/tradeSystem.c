@@ -38,7 +38,7 @@ int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* sz
 // Compares the entry channel with the high if we are selling long.
 
 int inEntryWindow(char* szEntryDate, char* szNoEntryDate, char* szCurrDate);
-// Returns true if we're still within the entry window.
+// Returns -1 if before the entry window, 0 if in the entry window, 1, if passed.
 
 double computeEntryPoints(int iType, double dTickSize, double dEntryChnl, double dOpen);
 // Computes the entry price, by comparing the open and entryChannel values.
@@ -111,7 +111,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         return iError;
     }
 
-    printf("Date\t Open\tHigh\tLow\tClose\tEntry\tTrail\tStop\n");
+/*    printf("Date\t Open\tHigh\tLow\tClose\tEntry\tTrail\tStop\n");
     for(i = 0; i < iSize; i++)
     {
         printf("%s %.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\t%.3lf\n",
@@ -123,7 +123,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
                adEntryChannel[i],
                adTrailStopChannel[i],
                adStopLossChannel[i]);
-    }
+    }*/
 
     //calculate the start day
     t = computeStartDay(iEntryWindow, iTrailStopWindow, iStopLossWindow);
@@ -152,7 +152,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
             else
             {
                 //set done flag, if past entry window
-                if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
+                if(inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]) > 0)
                     fDone = 1;
             }
         }
@@ -172,7 +172,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
                     dStopLoss, adTrailStopChannel[t-1], adOpen[t], adClose[t], iExit);
 
                 //set done flag, if past entry window
-                if(!inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]))
+                if(inEntryWindow(szEntryDate, szNoEntryDate, aszDates[t]) > 0)
                     fDone = 1;
             }
 
@@ -192,6 +192,7 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     {
         if(aszDates[i] != NULL) free(aszDates[i]);
     }
+
 
     free(adOpen);
     free(adClose);
@@ -307,7 +308,7 @@ int checkForNAValues(int t, double* adEntryChannel, double* adTrailStopChannel, 
     if(adEntryChannel[t-1] == ERRVAL || adTrailStopChannel[t-1] == ERRVAL || adStopLossChannel[t-1] == ERRVAL)
     {
         iErr = ERRVAL;
-        printf("tradeSystem: found an NA value where there shouldn't be one.\n");
+        fprintf(stderr, "tradeSystem: found an NA value where there shouldn't be one.\n");
     }
 
     return iErr;
@@ -321,7 +322,7 @@ int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* sz
     // low if we are selling short. Compares the entry channel with
     // the high if we are selling long.
 
-    if(inEntryWindow(szEntryDate, szNoEntryDate, szCurrDate))
+    if(inEntryWindow(szEntryDate, szNoEntryDate, szCurrDate) == 0)
     {
         //for short, compare low to entry channel
         if(iType == SHORT)
@@ -344,11 +345,11 @@ int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* sz
 
 int inEntryWindow(char* szEntryDate, char* szNoEntryDate, char* szCurrDate)
 {
-    // Returns true if we're still within the entry window.
-
-    if((strncmp(szCurrDate, szEntryDate, DATE_LEN)   > 0)  &&
-           (strncmp(szCurrDate, szNoEntryDate, DATE_LEN) <= 0) ) return 1; //still in window!
-    else return 0;
+    // Returns -1 if before the entry window, 0 if in the entry window, 1, if passed.
+    
+    if(strncmp(szCurrDate, szEntryDate, DATE_LEN) <= 0) return -1;
+    else if(strncmp(szCurrDate, szNoEntryDate, DATE_LEN) <= 0) return 0;
+    else return 1;
 }
 
 
