@@ -34,37 +34,37 @@ int generateTradeData(commod comCommodity,
     if (!padLow)
     {
         error(0,0,"padLow was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
     if (!padHigh)
     {
         error(0,0,"padHigh was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
     if (!padOpen)
     {
         error(0,0,"padOpen was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
     if (!padClose)
     {
         error(0,0,"padClose was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
     if (!paszDates)
     {
         error(0,0,"paszDates was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
     if (!piSize)
     {
         error(0,0,"piSize was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
@@ -83,15 +83,15 @@ int generateTradeData(commod comCommodity,
                  comCommodity.iYear))
     {
         error(0,0,"snprintf failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     fdInFile = open(szPathname, O_RDONLY);
-    if(fdInFile == -1)
+    if(fdInFile == ERRVAL)
     {
         error(0,0,"open failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
@@ -100,44 +100,46 @@ int generateTradeData(commod comCommodity,
     if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
     {
         error(0,0,"scanf didn't find any headers when it should have");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
         error(0,0,"malloc *padOpen failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padHigh = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
         error(0,0,"malloc *padHigh failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padLow = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
         error(0,0,"malloc *padLow failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padClose = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
         error(0,0,"malloc *padClose failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*paszDates = (char**)malloc(MAX_BUFFER*sizeof(char*)))))
     {
         error(0,0,"malloc *paszDates failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
+
+    memset(*paszDates,0,MAX_BUFFER*sizeof(char*));
 
     *piSize = 0;
     cbLeftover = 0;
@@ -185,7 +187,7 @@ int generateTradeData(commod comCommodity,
                     break;
                 default:
                     error(0,0,"sscanf returned an incorrect value");
-                    iRet = -1;
+                    iRet = ERRVAL;
                     goto exit;
                 }
             }
@@ -219,9 +221,12 @@ int generateTradeData(commod comCommodity,
         {
             free(*padClose);
         }
-        for (i = 0; (*paszDates)[i]; i++)
+        for (i = 0; i < *piSize; i++)
         {
-            free(*paszDates);
+            if ((*paszDates)[i])
+            {
+                free((*paszDates)[i]);
+            }
         }
         if (*paszDates)
         {
@@ -254,35 +259,35 @@ int generateChannels(commod comCommodity,
     if (!padEntryChannel)
     {
         error(0,0,"padEntryChannel was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if (!padTrailStopChannel)
     {
         error(0,0,"padTrailStopChannel was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if (!padStopLossChannel)
     {
         error(0,0,"padStopLossChannel was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if (!adLow)
     {
         error(0,0,"adLow was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if (!adHigh)
     {
         error(0,0,"adHigh was null");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
@@ -293,21 +298,21 @@ int generateChannels(commod comCommodity,
     if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
         error(0,0,"malloc *padEntryChannel failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
         error(0,0,"malloc *padTrailStopChannel failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
         error(0,0,"malloc *padStopLossChannel failed");
-        iRet = -1;
+        iRet = ERRVAL;
         goto exit;
     }
 
@@ -317,7 +322,7 @@ int generateChannels(commod comCommodity,
         {
             if(i < iEntryWindow)
             {
-                *padEntryChannel[i] = -1;
+                *padEntryChannel[i] = ERRVAL;
             }
             else
             {
@@ -333,7 +338,7 @@ int generateChannels(commod comCommodity,
             }
             if(i < iTrailStopWindow)
             {
-                *padTrailStopChannel[i] = -1;
+                *padTrailStopChannel[i] = ERRVAL;
             }
             else
             {
@@ -349,7 +354,7 @@ int generateChannels(commod comCommodity,
             }
             if(i < iStopLossWindow)
             {
-                *padStopLossChannel[i] = -1;
+                *padStopLossChannel[i] = ERRVAL;
             }
             else
             {
@@ -371,7 +376,7 @@ int generateChannels(commod comCommodity,
         {
             if(i < iEntryWindow)
             {
-                *padEntryChannel[i] = -1;
+                *padEntryChannel[i] = ERRVAL;
             }
             else
             {
@@ -387,7 +392,7 @@ int generateChannels(commod comCommodity,
             }
             if(i < iTrailStopWindow)
             {
-                *padTrailStopChannel[i] = -1;
+                *padTrailStopChannel[i] = ERRVAL;
             }
             else
             {
@@ -403,7 +408,7 @@ int generateChannels(commod comCommodity,
             }
             if(i < iStopLossWindow)
             {
-                *padStopLossChannel[i] = -1;
+                *padStopLossChannel[i] = ERRVAL;
             }
             else
             {
