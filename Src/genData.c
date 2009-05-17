@@ -28,6 +28,7 @@ int generateTradeData(commod comCommodity,
     int iRet = 0;
     int cbLeftover = 0;
     int iIndex;
+    int iVal;
     int i;
     int cbBytesReturned;
 
@@ -95,15 +96,6 @@ int generateTradeData(commod comCommodity,
         goto exit;
     }
 
-    //begin reading large chunks from the file
-    cbBytesReturned = read(fdInFile,szReadBuf,MAX_BUFFER);
-    if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
-    {
-        error(0,0,"scanf didn't find any headers when it should have");
-        iRet = ERRVAL;
-        goto exit;
-    }
-
     if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
         error(0,0,"malloc *padOpen failed");
@@ -143,10 +135,34 @@ int generateTradeData(commod comCommodity,
 
     *piSize = 0;
     cbLeftover = 0;
+    //begin reading large chunks from the file
+    cbBytesReturned = read(fdInFile,szReadBuf,MAX_BUFFER);
+
+    //verify that the file contains this header
+    if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
+    {
+        error(0,0,"scanf didn't find any headers when it should have");
+        iRet = ERRVAL;
+        goto exit;
+    }
+
+    printf("Got here\n");
+    //before entering our main loop, consume the header
+    for (cbLeftover = 0; cbLeftover < cbBytesReturned; cbLeftover++)
+    {
+            if (szReadBuf[cbLeftover] == '\n')
+            {
+                // Replace the newline with NULL
+                szReadBuf[cbLeftover] = '\0';
+                break;
+            }
+    }
+
+    cbLeftover++;
+    szCurLine = szReadBuf + cbLeftover;
+
     do
     {
-        szCurLine = szReadBuf;
-
         // For each character in the chunk:
         for (iIndex = cbLeftover; iIndex < cbBytesReturned; iIndex++)
         {
@@ -158,15 +174,15 @@ int generateTradeData(commod comCommodity,
                 szReadBuf[iIndex] = '\0';
 
                 // malloc space for the date
-                *paszDates[*piSize] = (char*)malloc(8*sizeof(char));
+                (*paszDates)[*piSize] = (char*)malloc(8*sizeof(char));
 
-                switch(sscanf(szReadBuf,
-                              "%8s, %f, %f, %f, %f",
-                              (*paszDates)[*piSize],
-                              (float*)&((*padOpen)[*piSize]),
-                              (float*)&((*padHigh)[*piSize]),
-                              (float*)&((*padLow)[*piSize]),
-                              (float*)&((*padClose)[*piSize])))
+                switch((iVal = sscanf(szCurLine,
+                                      "%8s, %lf, %lf, %lf, %lf",
+                                      (*paszDates)[*piSize],
+                                      &((*padOpen)[*piSize]),
+                                      &((*padHigh)[*piSize]),
+                                      &((*padLow)[*piSize]),
+                                      &((*padClose)[*piSize]))))
                 {
                 case 0: //expected at the end of the file
 
@@ -186,6 +202,9 @@ int generateTradeData(commod comCommodity,
                     szCurLine = szReadBuf+iIndex+1;
                     break;
                 default:
+                    fprintf(stderr,"szCurLine = %s\n",szCurLine);
+                    fprintf(stderr,"*piSize = %d\n",*piSize);
+                    fprintf(stderr,"iVal = %d\n",iVal);
                     error(0,0,"sscanf returned an incorrect value");
                     iRet = ERRVAL;
                     goto exit;
@@ -199,6 +218,7 @@ int generateTradeData(commod comCommodity,
 
         // And then refill the remainder with more from the file
         cbBytesReturned = read(fdInFile,szReadBuf + cbLeftover,szCurLine - szReadBuf);
+        szCurLine = szReadBuf;
     }
     while (cbBytesReturned != 0);
 
@@ -253,8 +273,8 @@ int generateChannels(commod comCommodity,
     int iRet = 0;
     int i;
     int j;
-    int min;
-    int max;
+    double min;
+    double max;
 
     if (!padEntryChannel)
     {
@@ -320,53 +340,53 @@ int generateChannels(commod comCommodity,
     {
         for(i = 0; i < iSize; i++)
         {
-            if(i < iEntryWindow)
+            if(i < (iEntryWindow - 1))
             {
-                *padEntryChannel[i] = ERRVAL;
+                (*padEntryChannel)[i] = ERRVAL;
             }
             else
             {
                 min = adLow[i];
-                for(j = i - iEntryWindow; j < i; j++)
+                for(j = i - (iEntryWindow - 1); j < i; j++)
                 {
-                    if(adLow[j] < adLow[i])
+                    if(adLow[j] < min)
                     {
                         min = adLow[j];
                     }
                 }
-                *padEntryChannel[i] = min;
+                (*padEntryChannel)[i] = min;
             }
-            if(i < iTrailStopWindow)
+            if(i < (iTrailStopWindow - 1))
             {
-                *padTrailStopChannel[i] = ERRVAL;
-            }
-            else
-            {
-                max = adHigh[i];
-                for(j = i - iTrailStopWindow; j < i; j++)
-                {
-                    if(adHigh[j] > adHigh[i])
-                    {
-                        max = adHigh[j];
-                    }
-                }
-                *padTrailStopChannel[i] = max;
-            }
-            if(i < iStopLossWindow)
-            {
-                *padStopLossChannel[i] = ERRVAL;
+                (*padTrailStopChannel)[i] = ERRVAL;
             }
             else
             {
                 max = adHigh[i];
-                for(j = i - iStopLossWindow; j < i; j++)
+                for(j = i - (iTrailStopWindow - 1); j < i; j++)
                 {
-                    if(adHigh[j] > adHigh[i])
+                    if(adHigh[j] > max)
                     {
                         max = adHigh[j];
                     }
                 }
-                *padStopLossChannel[i] = max;
+                (*padTrailStopChannel)[i] = max;
+            }
+            if(i < (iStopLossWindow - 1))
+            {
+                (*padStopLossChannel)[i] = ERRVAL;
+            }
+            else
+            {
+                max = adHigh[i];
+                for(j = i - (iStopLossWindow - 1); j < i; j++)
+                {
+                    if(adHigh[j] > max)
+                    {
+                        max = adHigh[j];
+                    }
+                }
+                (*padStopLossChannel)[i] = max;
             }
         }
     }
@@ -374,53 +394,53 @@ int generateChannels(commod comCommodity,
     {
         for(i = 0; i < iSize; i++)
         {
-            if(i < iEntryWindow)
+            if(i < (iEntryWindow - 1))
             {
-                *padEntryChannel[i] = ERRVAL;
+                (*padEntryChannel)[i] = ERRVAL;
             }
             else
             {
                 max = adHigh[i];
-                for(j = i - iEntryWindow; j < i; j++)
+                for(j = i - (iEntryWindow - 1); j < i; j++)
                 {
-                    if(adHigh[j] > adHigh[i])
+                    if(adHigh[j] > max)
                     {
                         max = adHigh[j];
                     }
                 }
-                *padEntryChannel[i] = max;
+                (*padEntryChannel)[i] = max;
             }
-            if(i < iTrailStopWindow)
+            if(i < (iTrailStopWindow - 1))
             {
-                *padTrailStopChannel[i] = ERRVAL;
-            }
-            else
-            {
-                min = adLow[i];
-                for(j = i - iTrailStopWindow; j < i; j++)
-                {
-                    if(adLow[j] < adLow[i])
-                    {
-                        min = adLow[j];
-                    }
-                }
-                *padTrailStopChannel[i] = min;
-            }
-            if(i < iStopLossWindow)
-            {
-                *padStopLossChannel[i] = ERRVAL;
+                (*padTrailStopChannel)[i] = ERRVAL;
             }
             else
             {
                 min = adLow[i];
-                for(j = i - iStopLossWindow; j < i; j++)
+                for(j = i - (iTrailStopWindow - 1); j < i; j++)
                 {
-                    if(adLow[j] < adLow[i])
+                    if(adLow[j] < min)
                     {
                         min = adLow[j];
                     }
                 }
-                *padStopLossChannel[i] = min;
+                (*padTrailStopChannel)[i] = min;
+            }
+            if(i < (iStopLossWindow - 1))
+            {
+                (*padStopLossChannel)[i] = ERRVAL;
+            }
+            else
+            {
+                min = adLow[i];
+                for(j = i - (iStopLossWindow - 1); j < i; j++)
+                {
+                    if(adLow[j] < min)
+                    {
+                        min = adLow[j];
+                    }
+                }
+                (*padStopLossChannel)[i] = min;
             }
         }
     }
