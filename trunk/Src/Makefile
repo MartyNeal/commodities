@@ -3,7 +3,7 @@
 #make file for CS352, W09 assignment 3
 
 CC= gcc
-CFLAGS=  -g -Wall
+CFLAGS=  -g -Wall -c #<---- will want to remove the -c later!!!
 SOURCES= tradeSystem.o main.o
 
 all: trade
