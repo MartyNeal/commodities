@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <error.h>
-
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include "tradeSystem.h"
 /*
-MAX_BUFFER is the amount to read in from an input file at a time.  Generally,
-this should be set as high as possible to achieve the best performance.
+  MAX_BUFFER is the amount to read in from an input file at a time.  Generally,
+  this should be set as high as possible to achieve the best performance.
 */
-#define MAX_BUFFER ~(1<<16) //64K at a time
+#define MAX_BUFFER (1<<16) //64K at a time
 
 int generateTradeData(commod comCommodity,
                       double **padLow,
@@ -19,48 +24,46 @@ int generateTradeData(commod comCommodity,
     char szPathname[256] = DATAPATH;
     char szReadBuf[MAX_BUFFER];
     char* szCurLine;
+    int fdInFile;
     int iRet = 0;
     int cbLeftover = 0;
     int iIndex;
-    char* szDate[8]; //get rid of this magic number
-    int open;
-    int high;
-    int low;
-    int close;
+    int i;
+    int cbBytesReturned;
 
     if (!padLow)
     {
-        error("padLow was null");
+        error(0,0,"padLow was null");
         iRet = -1;
         goto exit;
     }
     if (!padHigh)
     {
-        error("padHigh was null");
+        error(0,0,"padHigh was null");
         iRet = -1;
         goto exit;
     }
     if (!padOpen)
     {
-        error("padOpen was null");
+        error(0,0,"padOpen was null");
         iRet = -1;
         goto exit;
     }
     if (!padClose)
     {
-        error("padClose was null");
+        error(0,0,"padClose was null");
         iRet = -1;
         goto exit;
     }
     if (!paszDates)
     {
-        error("paszDates was null");
+        error(0,0,"paszDates was null");
         iRet = -1;
         goto exit;
     }
     if (!piSize)
     {
-        error("piSize was null");
+        error(0,0,"piSize was null");
         iRet = -1;
         goto exit;
     }
@@ -77,17 +80,17 @@ int generateTradeData(commod comCommodity,
                  "%s%s%d.txt",
                  DATAPATH,
                  comCommodity.szName,
-                 comCommodity.year))
+                 comCommodity.iYear))
     {
-        error("snprintf failed");
+        error(0,0,"snprintf failed");
         iRet = -1;
         goto exit;
     }
 
     fdInFile = open(szPathname, O_RDONLY);
-    if(fdFile == -1)
+    if(fdInFile == -1)
     {
-        error("open failed");
+        error(0,0,"open failed");
         iRet = -1;
         goto exit;
     }
@@ -96,47 +99,47 @@ int generateTradeData(commod comCommodity,
     cbBytesReturned = read(fdInFile,szReadBuf,MAX_BUFFER);
     if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
     {
-        error("scanf didn't find any headers when it should have");
+        error(0,0,"scanf didn't find any headers when it should have");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double*)))))
+    if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error("malloc *padOpen failed");
+        error(0,0,"malloc *padOpen failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padHigh = (double*)malloc(MAX_BUFFER*sizeof(double*)))))
+    if(!((*padHigh = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error("malloc *padHigh failed");
+        error(0,0,"malloc *padHigh failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padLow = (double*)malloc(MAX_BUFFER*sizeof(double*)))))
+    if(!((*padLow = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error("malloc *padLow failed");
+        error(0,0,"malloc *padLow failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padClose = (double*)malloc(MAX_BUFFER*sizeof(double*)))))
+    if(!((*padClose = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error("malloc *padClose failed");
+        error(0,0,"malloc *padClose failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*paszDates = (char**)malloc(MAX_BUFFER*sizeof(char**)))))
+    if(!((*paszDates = (char**)malloc(MAX_BUFFER*sizeof(char*)))))
     {
-        error("malloc *paszDates failed");
+        error(0,0,"malloc *paszDates failed");
         iRet = -1;
         goto exit;
     }
 
-    *iSize = 0;
+    *piSize = 0;
     cbLeftover = 0;
     do
     {
@@ -152,33 +155,36 @@ int generateTradeData(commod comCommodity,
                 // Replace the newline with NULL
                 szReadBuf[iIndex] = '\0';
 
+                // malloc space for the date
+                *paszDates[*piSize] = (char*)malloc(8*sizeof(char));
+
                 switch(sscanf(szReadBuf,
-                              "%8s, %d, %d, %d, %d",
-                              &paszDates[iSize],
-                              &padOpen[iSize],
-                              &padHigh[iSize],
-                              &padLow[iSize],
-                              &padClose[iSize]))
+                              "%8s, %f, %f, %f, %f",
+                              (*paszDates)[*piSize],
+                              (float*)&((*padOpen)[*piSize]),
+                              (float*)&((*padHigh)[*piSize]),
+                              (float*)&((*padLow)[*piSize]),
+                              (float*)&((*padClose)[*piSize])))
                 {
                 case 0: //expected at the end of the file
 
                     //resize the arrays to just the right size
-                    *padOpen = (double*)realloc(*iSize*sizeof(double*));
-                    *padHigh = (double*)realloc(*iSize*sizeof(double*));
-                    *padLow = (double*)realloc(*iSize*sizeof(double*));
-                    *padClose = (double*)realloc(*iSize*sizeof(double*));
-                    *paszDates = (char**)realloc(*iSize*sizeof(char**));
+                    *padOpen = (double*)realloc(*padOpen, *piSize*sizeof(double));
+                    *padHigh = (double*)realloc(*padHigh, *piSize*sizeof(double));
+                    *padLow = (double*)realloc(*padLow, *piSize*sizeof(double));
+                    *padClose = (double*)realloc(*padClose, *piSize*sizeof(double));
+                    *paszDates = (char**)realloc(*paszDates, *piSize*sizeof(char*));
                     goto exit;
                     break;
                 case 5: //expected
                     //increment the index of the array
-                    *iSize++;
+                    (*piSize)++;
 
                     //set the curLine to be the next line
                     szCurLine = szReadBuf+iIndex+1;
                     break;
                 default:
-                    error("sscanf returned an incorrect value");
+                    error(0,0,"sscanf returned an incorrect value");
                     iRet = -1;
                     goto exit;
                 }
@@ -213,13 +219,17 @@ int generateTradeData(commod comCommodity,
         {
             free(*padClose);
         }
+        for (i = 0; (*paszDates)[i]; i++)
+        {
+            free(*paszDates);
+        }
         if (*paszDates)
         {
             free(*paszDates);
         }
     }
 
-    close(fdFile);
+    close(fdInFile);
 
     return iRet;
 }
@@ -230,44 +240,48 @@ int generateChannels(commod comCommodity,
                      int iEntryWindow,
                      int iTrailStopWindow,
                      int iStopLossWindow,
+                     int iSize,
                      double** padEntryChannel,
                      double** padTrailStopChannel,
                      double** padStopLossChannel)
 {
-    int i;
     int iRet = 0;
+    int i;
+    int j;
+    int min;
+    int max;
 
     if (!padEntryChannel)
     {
-        error("padEntryChannel was null");
+        error(0,0,"padEntryChannel was null");
         iRet = -1;
         goto exit;
     }
 
     if (!padTrailStopChannel)
     {
-        error("padTrailStopChannel was null");
+        error(0,0,"padTrailStopChannel was null");
         iRet = -1;
         goto exit;
     }
 
     if (!padStopLossChannel)
     {
-        error("padStopLossChannel was null");
+        error(0,0,"padStopLossChannel was null");
         iRet = -1;
         goto exit;
     }
 
     if (!adLow)
     {
-        error("adLow was null");
+        error(0,0,"adLow was null");
         iRet = -1;
         goto exit;
     }
 
     if (!adHigh)
     {
-        error("adHigh was null");
+        error(0,0,"adHigh was null");
         iRet = -1;
         goto exit;
     }
@@ -276,30 +290,30 @@ int generateChannels(commod comCommodity,
     *padTrailStopChannel = NULL;
     *padStopLossChannel = NULL;
 
-    if(!((*padEntryChannel = (double*)malloc(comCommodity.iSize*sizeof(double*)))))
+    if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
-        error("malloc *padEntryChannel failed");
+        error(0,0,"malloc *padEntryChannel failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padTrailStopChannel = (double*)malloc(comCommodity.iSize*sizeof(double*)))))
+    if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
-        error("malloc *padTrailStopChannel failed");
+        error(0,0,"malloc *padTrailStopChannel failed");
         iRet = -1;
         goto exit;
     }
 
-    if(!((*padStopLossChannel = (double*)malloc(comCommodity.iSize*sizeof(double*)))))
+    if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double*)))))
     {
-        error("malloc *padStopLossChannel failed");
+        error(0,0,"malloc *padStopLossChannel failed");
         iRet = -1;
         goto exit;
     }
 
     if (comCommodity.iType == SHORT)
     {
-        for(i = 0; i < comCommodity.iSize; i++)
+        for(i = 0; i < iSize; i++)
         {
             if(i < iEntryWindow)
             {
@@ -353,7 +367,7 @@ int generateChannels(commod comCommodity,
     }
     else
     {
-        for(i = 0; i < comCommodity.iSize; i++)
+        for(i = 0; i < iSize; i++)
         {
             if(i < iEntryWindow)
             {
