@@ -8,6 +8,10 @@
  *
  */
 
+#ifndef __trade_system__
+#define __trade_system__
+
+
 #define DATAPATH "../Data"
 #define SHORT 0
 #define LONG 1
@@ -15,24 +19,23 @@
 
 typedef struct commodity
 {   
-    char *szName;
+    char* szName;
     int iType;         
     int iYear;
     double dTickVal;
     double dTickSize;
 } commod;
 
+int generateTradeData(commod comCommodity, double** padLow, double** padHigh, double** padOpen, 
+    double** padClose, char*** paszDates, int* piSize);
 
-int generateTradeData(commod comCommodity, double **ppdLow, double **ppdHigh, double **ppdOpen, 
-    double **ppdClose, char ***ppszDates, int *piSize);
-
-int generateChannels(commod comCommodity, double *pdLow, double *pdHigh, int iEntryWindow, 
-    int iTrailStopWindow, int iStopLossWindow, double **ppdEntryChannel, double **ppdTrailStopChannel,
-    double **ppdStopLossChannel);
-
+int generateChannels(commod comCommodity, double* adLow, double* adHigh, int iEntryWindow, 
+    int iTrailStopWindow, int iStopLossWindow, double** padEntryChannel, double** padTrailStopChannel,
+    double** padStopLossChannel);
 
 
 
+#endif 
 
 
 

@@ -1,20 +1,30 @@
+/*
+ * header file database.h
+ *
+ * Database containing the type, tick size and tick value for each commodity
+ *
+ * Becky Engley and Martin Neal
+ * May 2009
+ *
+ */
+
 #include "tradeSystem.h"
 
-commod comDatabase[14];
+#define NUMCOMMODS 14
 
-comDatabase = { {"Jun_CL", LONG, 0, 10, 0.01}
-                {"May_HO", LONG, 0, 4.2, 0.0001}
-                {"Jun_LH", LONG, 0, 10, 0.025}
-                {"Jun_HU", LONG, 0, 4.2, 0.0001}
-                {"Aug_PB", SHORT, 0, 10, 0.025}
-                {"Sep_OJ", SHORT, 0, 7.5, 0.05}
-                {"Dec_C", SHORT, 0, 12.5, .25}
-                {"Dec_LH", SHORT, 0, 10, 0.025}
-                {"Dec_KW", SHORT, 0, 12.5, 0.25}
-                {"Nov_HO", LONG, 0, 4.2 0.0001}
-                {"Nov_CL", LONG, 0, 10, 0.01}
-                {"Oct_LH", LONG, 0, 10. 0.025}
-                {"Feb_CL", SHORT, 0, 10, 0.01}
-                {"Apr_LC", LONG, 0, 10, 0.025} };
+commod comDatabase[NUMCOMMODS] = {  {"Jun_CL", LONG, 0, 10, 0.01},
+                                    {"May_HO", LONG, 0, 4.2, 0.0001},
+                                    {"Jun_LH", LONG, 0, 10, 0.025},
+                                    {"Jun_HU", LONG, 0, 4.2, 0.0001},
+                                    {"Aug_PB", SHORT, 0, 10, 0.025},
+                                    {"Sep_OJ", SHORT, 0, 7.5, 0.05},
+                                    {"Dec_C", SHORT, 0, 12.5, .25},
+                                    {"Dec_LH", SHORT, 0, 10, 0.025},
+                                    {"Dec_KW", SHORT, 0, 12.5, 0.25},
+                                    {"Nov_HO", LONG, 0, 4.2, 0.0001},
+                                    {"Nov_CL", LONG, 0, 10, 0.01},
+                                    {"Oct_LH", LONG, 0, 10, 0.025},
+                                    {"Feb_CL", SHORT, 0, 10, 0.01},
+                                    {"Apr_LC", LONG, 0, 10, 0.025} };
 
 
