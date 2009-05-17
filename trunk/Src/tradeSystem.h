@@ -14,7 +14,7 @@
 #define DATAPATH "../Data/"
 #define SHORT 0
 #define LONG 1
-
+#define MAX_NAME_LEN 6
 
 typedef struct commodity
 {
