@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <error.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -34,37 +33,37 @@ int generateTradeData(commod comCommodity,
 
     if (!padLow)
     {
-        error(0,0,"padLow was null");
+        fprintf(stderr,"padLow was null");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padHigh)
     {
-        error(0,0,"padHigh was null");
+        fprintf(stderr,"padHigh was null");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padOpen)
     {
-        error(0,0,"padOpen was null");
+        fprintf(stderr,"padOpen was null");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padClose)
     {
-        error(0,0,"padClose was null");
+        fprintf(stderr,"padClose was null");
         iRet = ERRVAL;
         goto exit;
     }
     if (!paszDates)
     {
-        error(0,0,"paszDates was null");
+        fprintf(stderr,"paszDates was null");
         iRet = ERRVAL;
         goto exit;
     }
     if (!piSize)
     {
-        error(0,0,"piSize was null");
+        fprintf(stderr,"piSize was null");
         iRet = ERRVAL;
         goto exit;
     }
@@ -83,7 +82,7 @@ int generateTradeData(commod comCommodity,
                  comCommodity.szName,
                  comCommodity.iYear))
     {
-        error(0,0,"snprintf failed");
+        fprintf(stderr,"snprintf failed");
         iRet = ERRVAL;
         goto exit;
     }
@@ -91,42 +90,42 @@ int generateTradeData(commod comCommodity,
     fdInFile = open(szPathname, O_RDONLY);
     if(fdInFile == ERRVAL)
     {
-        error(0,0,"open failed");
+        fprintf(stderr,"open failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error(0,0,"malloc *padOpen failed");
+        fprintf(stderr,"malloc *padOpen failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padHigh = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error(0,0,"malloc *padHigh failed");
+        fprintf(stderr,"malloc *padHigh failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padLow = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error(0,0,"malloc *padLow failed");
+        fprintf(stderr,"malloc *padLow failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padClose = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        error(0,0,"malloc *padClose failed");
+        fprintf(stderr,"malloc *padClose failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*paszDates = (char**)malloc(MAX_BUFFER*sizeof(char*)))))
     {
-        error(0,0,"malloc *paszDates failed");
+        fprintf(stderr,"malloc *paszDates failed");
         iRet = ERRVAL;
         goto exit;
     }
@@ -141,7 +140,7 @@ int generateTradeData(commod comCommodity,
     //verify that the file contains this header
     if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
     {
-        error(0,0,"scanf didn't find any headers when it should have");
+        fprintf(stderr,"scanf didn't find any headers when it should have");
         iRet = ERRVAL;
         goto exit;
     }
@@ -204,7 +203,7 @@ int generateTradeData(commod comCommodity,
                     fprintf(stderr,"szCurLine = %s\n",szCurLine);
                     fprintf(stderr,"*piSize = %d\n",*piSize);
                     fprintf(stderr,"iVal = %d\n",iVal);
-                    error(0,0,"sscanf returned an incorrect value");
+                    fprintf(stderr,"sscanf returned an incorrect value");
                     iRet = ERRVAL;
                     goto exit;
                 }
@@ -277,35 +276,35 @@ int generateChannels(commod comCommodity,
 
     if (!padEntryChannel)
     {
-        error(0,0,"padEntryChannel was null");
+        fprintf(stderr,"padEntryChannel was null");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!padTrailStopChannel)
     {
-        error(0,0,"padTrailStopChannel was null");
+        fprintf(stderr,"padTrailStopChannel was null");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!padStopLossChannel)
     {
-        error(0,0,"padStopLossChannel was null");
+        fprintf(stderr,"padStopLossChannel was null");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!adLow)
     {
-        error(0,0,"adLow was null");
+        fprintf(stderr,"adLow was null");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!adHigh)
     {
-        error(0,0,"adHigh was null");
+        fprintf(stderr,"adHigh was null");
         iRet = ERRVAL;
         goto exit;
     }
@@ -316,21 +315,21 @@ int generateChannels(commod comCommodity,
 
     if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        error(0,0,"malloc *padEntryChannel failed");
+        fprintf(stderr,"malloc *padEntryChannel failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        error(0,0,"malloc *padTrailStopChannel failed");
+        fprintf(stderr,"malloc *padTrailStopChannel failed");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        error(0,0,"malloc *padStopLossChannel failed");
+        fprintf(stderr,"malloc *padStopLossChannel failed");
         iRet = ERRVAL;
         goto exit;
     }
