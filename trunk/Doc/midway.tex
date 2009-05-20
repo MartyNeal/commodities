@@ -1,0 +1,387 @@
+\documentclass[10pt]{article}
+\usepackage{graphicx, url}
+\usepackage[left=2cm,top=1cm,right=2.5cm,bottom=1cm,nohead,nofoot]{geometry}
+\setlength{\parskip}{5mm plus5mm minus2mm}
+\setlength{\parindent}{0mm}
+
+\title{Machine learning optimal parameters for a channel breakout system for trading
+commodities}
+\author{Martin Neal\\
+  Becky Engley}
+\date{\today}
+
+\begin{document}
+
+\section{Introduction}
+
+Commodities are raw materials, agricultural products that can be traded on
+specialist commodities markets.  This paper aims to data mine commodity market
+prices to enhance a predefined automated trading system.
+
+The system to be enhanced is a channel breakout system described by John
+Momsen's book, Superstar Seasonals.  A channel breakout system is a type of
+trend following system which is a type of technical analysis.  Technical
+analysis relies on the assumption that future market prices may be predicted by
+studying past market prices and volume.  Trend following systems attempt to
+determine when a market trend will begin and end, and make investments
+accordingly.  A channel breakout system uses channel lines
+
+Machine learning, a field closely related to data mining, is concerned with
+algorithms which improve over time as additional data is obtained.  This paper
+will attempt to independently use two machine learning techniques to generate
+the best parameters possible for the channel breakout system.
+
+%A commodity is either traded short or long.  If a trader expects an uptrend in
+%the value of a commodity, he will trade long, buying before selling.  If a
+%trader expects a downtrend, he will trade short, selling before buying.
+
+\section{Related Work}
+
+In his book, Superstar Seasonals, John Momson defines a channel breakout system
+as a model for predicting uptrends and downtrends.  According to his system, a
+commodity may be traded between a range of dates specified by the static parameters
+$entry\_window\_open$ and $entry\_window\_close$.  A trade must be completed no
+later than the $exit\_trade$ date, a third parameter of the system.
+
+Momsen defines an upper channel line and a lower channel line.  The upper
+channel line is determined by the maximum $high$ value over the previous $m$
+days.  The lower channel line is determined by the minimum $low$ value over the
+previous $n$ days.  Here, $m$ and $n$ are also parameters of the system and are
+different for each commodity.  If trading long, the upper channel line is the
+$entry$ line and the lower channel line is the $trail$-$stop$ line.  If trading
+short, the channel lines are reversed.
+
+The sixth and final system parameter, the $stop$-$loss$ threshold, serves as a
+safety net to prevent large losses.  When trading short, the stop-loss is
+defined by the maximum $high$ value over the previous $q$ days, where $q$ is
+strictly less than $m$.  When trading long, the stop-loss is defined by the
+minimum $low$ value over the previous $q$ days, where $q$ is strictly less than
+$n$.  The trail-stop line protects profits, while the stop-loss threshold
+minimizes losses.
+
+According to the system, if the current value of the commodity crosses the entry
+line, it indicates the beginning of a new trend and the trade is begun.  When
+the current value of the commodity crosses the trail-stop line, the trade is
+completed.  More often than not, the cross of a channel line incorrectly
+predicts the beginning of a trend.  In these cases, small losses are incurred.
+However, when the system correctly predicts a long trend, the profits generated
+by this trend more than make up for small losses.
+
+Over the past thirty years, Momsen has traded this system, with outstanding
+results.  We intend to extend his work, by machine learning optimal values for
+the six trading parameters.
+
+\section{Methods}
+
+Simulated annealing and genetic algorithms are well suited for optimization
+problems such as these because they can find satisfactory solutions in large
+hypothesis spaces, and use a constant amount of memory by saving only the
+currently best solution to the problem and the algorithms proceed.
+
+
+%introduce methods and algorithms here
+
+\subsection{Data Set}
+
+We have financial market data for eighteen commodities over a period of thirty
+years.  Because the learning system is evaluated per contract year, each year
+comprises a single data point.  We have approximately thirty data points for
+each commodity.  The commodities include live cattle, pork bellies, corn, wheat,
+lean hogs, crude oil, sugar, unleaded gasoline, heating oil, soybeans, cotton,
+orange juice, and soybean oil.  Some commodities are traded during multiple
+seasons.  The data includes open, high, low, and closing values for each
+commodity on every trading day.
+
+The data set will be partitioned into two sets, training data and testing data.
+For each commodity, we will use the only two thirds of the data to train the
+system, reserving the remaining data to test the system.  We will use the most
+recent data for testing.  No validation data is reserved because our model is
+predetermined.
+
+\subsection{Algorithms}
+
+Optimal parameter values maximize the profit earned as a result of trading the
+system.  We will approach this optimization problem using two different machine
+learning techniques: simulated annealing, and genetic algorithms.  Below we
+present these two algorithms, along with the algorithm for our channel breakout
+system.
+
+\subsubsection{The Channel Breakout System}
+
+The algorithm for the channel breakout system takes in the six system trading
+parameters, and returns the total profit earned. Our tradeSystem function
+represents our objective function, the return value of which we are trying to
+maximize.  It is used as the $value()$ function for the Simulated Annealing algorithm,
+and the fitness function for the Genetic algorithm, both defined below.
+
+\setlength{\parindent}{5mm}
+\indent tradeSystem($entry\_window\_open$, $entry\_window\_close$, $exit\_date$,\\
+\indent \indent \indent \indent \indent $entry\_threshold$, $trailstop\_threshold$, $stoploss\_threshold$)\\
+\indent \indent compute entry, trailstop and stoploss channels, using thresholds\\
+\indent \indent do\\
+\indent \indent \indent if(in\_trade)\\
+\indent \indent \indent \indent if(entry line is crossed)\\
+\indent \indent \indent \indent \indent in\_trade $\leftarrow$ TRUE\\
+\indent \indent \indent \indent \indent entry\_price $\leftarrow$ current\_price\\
+\indent \indent \indent \indent \indent stoploss value $\leftarrow$ current\_price + stoploss\_threshold\\
+\indent \indent \indent else\\
+\indent \indent \indent \indent if(trailstop\_ threshold $>$ current\_price or\\
+\indent \indent \indent \indent \indent stoploss\_threshold $>$ current\_price or\\
+\indent \indent \indent \indent \indent exit\_date = current\_date)\\
+\indent \indent \indent \indent \indent in\_trade $\leftarrow$ FALSE\\
+\indent \indent \indent \indent \indent exit\_price $\leftarrow$ current\_price\\
+\indent \indent while(current\_date $<$ entry\_window\_close or in a trade)\\
+\indent \indent return profit\\
+\setlength{\parindent}{0mm}
+
+We may repeatedly enter and then exit a trade many times over the course of one
+trading year. When in a trade, we check every day, to determine if we should
+exit; when not currently in a trade, we check to determine if we should enter,
+until the entry window closes. When we enter, we compute the entry price based
+on the value at which we crossed the entry channel line. The stoploss value is
+also based on this cross-point. When we exit, we compute the exit price based on
+the value at which we crossed the closer of the trail stop channel and the stop
+loss channel. The profit for this trade is the difference between the entry and
+exit prices.
+
+\subsubsection{Simulated Annealing}
+Simulated Annealing combines the best of hill climbing and random walk heuristic
+algorithms.  The major problem with hill climbing algorithms is that they can
+get stuck on local maxima, because they never move downhill.
+Random walks, however, are guaranteed to find the global maximum but take far
+too long to do so.  Simulated Annealing combines these approaches, yielding both
+efficiency and completeness.  We present the psuedo-code for the Simulated
+Annealing algorithm below.
+
+\setlength{\parindent}{5mm}
+\indent simulated-annealing()\\
+\indent \indent current $\leftarrow$ 6 random parameter values\\
+\indent \indent for t $\leftarrow$ 1 to $\infty$\\
+\indent \indent \indent $\eta \leftarrow f$(t)\\
+\indent \indent \indent next $\leftarrow$ successor(current)\\
+\indent \indent \indent $\Delta E \leftarrow$ value(next) - value(current)\\
+\indent \indent \indent if($\Delta E > 0$)\\
+\indent \indent \indent \indent current $\leftarrow$ next\\
+\indent \indent \indent else\\
+\indent \indent \indent \indent current $\leftarrow$ next only with probability $e^{\Delta E\eta}$\\
+\indent \indent return current\\
+\setlength{\parindent}{0mm}
+
+The value function trades the system with the six parameters and returns the
+profit made (or lost).  current and next are both nodes.  In this context, a
+node is a set of values for the six parameters.  $\eta$ controls the probability
+of downward steps.  $f$(t) is a decreasing function of time; it decreases the
+probability of downward steps as time increases.  This may be done in any number
+of ways (e.g. linearly, exponentially).  The choice for the successor function
+greatly affects the learning speed of the algorithm.  Our successor function
+will adjust exactly one of the six parameters in current by a random amount,
+$\delta$, which may be either uniformly or normally distributed.  As a variation
+on this function, we can change multiple parameters at once.  We intend to
+experiment with all of these variations.
+\subsubsection{Genetic Algorithm}
+Genetic Algorithms model evolutionary processes.  In our proposed
+implementation, a set of six system parameters represents an individual.  Many
+individuals form a population which is repeatedly bred and then culled.
+Breeding swaps random parameters from two or more parents to create children.
+Culling evaluates each individual using a fitness function, and eliminates unfit
+individuals from the population.  The fitness function returns the profit earned
+by trading the channel breakout system using the individuals' six parameters.
+We present the psuedo-code for the Genetic Algorithm below.
+
+\setlength{\parindent}{5mm}
+\indent genetic-algorithm(population)\\
+\indent \indent do\\
+\indent \indent \indent for i $\leftarrow$ 1 to size(population)\\
+\indent \indent \indent \indent parents $\leftarrow$ random-subset(population,size)\\
+\indent \indent \indent \indent children $\leftarrow$ reproduce(parents)\\
+\indent \indent \indent \indent children $\leftarrow$ mutate(children) with small random probability\\
+\indent \indent \indent \indent population.add(children)\\
+\indent \indent \indent population $\leftarrow$ cull(population,threshold)\\
+\indent \indent until (enough time has elapsed)\\
+\indent \indent return best-individual(population)\\
+\setlength{\parindent}{0mm}
+
+This generic algorithm leaves a lot to be decided by the implementer.
+The initial population size may vary.  The mutate probability may be changed.
+The mutation of an attribute may be uniformly random or normally distributed.
+The reproduce function may take between two and six parents.  These parents
+randomly swap attributes to produce one or more children, which are added to the
+population.  The population is then culled, which preserves a threshold
+number of individuals, removing all others as unfit.
+
+\subsubsection{A Random Learner}
+
+Here we describe a simple learner for the maximizing the parameters to
+$tradeSystem()$.  This learner begins by randomly generating parameters as its
+best guess for maximizing profits.  It then loops for a set number of iterations,
+randomly choosing  six parameters at a time, keeping the best set of parameters.
+
+\setlength{\parindent}{5mm}
+\indent random-algorithm(epochs)\\
+\indent \indent current $\leftarrow$ 6 random parameter values\\
+\indent \indent for t $\leftarrow$ 1 to epochs\\
+\indent \indent \indent next $\leftarrow$ 6 random parameter values\\
+\indent \indent \indent if(value(next) > value(current))\\
+\indent \indent \indent \indent current $\leftarrow$ next\\
+\indent \indent return current\\
+\setlength{\parindent}{0mm}
+
+\section{Experiments and Results}
+
+We were interested in two attributes of our learning system.  We wanted
+to know how well each learner did given a lot of time, as well as how quickly it
+learned.  We discuss each statistic below.
+
+\section{Profits}
+
+Below is the are the parameters obtained for each commodities using three
+systems, simulated annealing, genetic algorithm, and Momsens's parameters.  Also
+indicated is the profits obtained using the parameters.
+
+NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  April & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Live Cattle & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  August & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Pork Bellies & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Corn & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Wheat & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December  & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  February & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  July & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Soy Beans & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Unleaded Gas & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  May & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Heating Oil & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  November & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  October & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  September    & \multicolumn{3}{|c|}{Channel Sizes} & \multicolumn{3}{|c|}{Dates} &  \\
+  Orange Juice & Entry & Trail Stop & Stop Loss & Entry & No Entry & Exit & Profit\\ \hline
+  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
+  Genetic Algorithms &p a & b & c & d & e & f & \$ \\ \hline
+  Momsen &  a & b & c & d & e & f & \$ \\ \hline
+\end{tabular}
+
+\subsection{Learning Speed}
+
+Here is a chart of the average profit over all commodities as a function of
+time.  Each unit of time represents an epoch or an iteration through the main
+loop of the algorithm during training over the training data.  The y-axis is the
+total profit earned from trading the system using the parameters on the testing
+data.
+
+PLOT AND DISCUSSION OF PLOT GOES HERE.\\
+COMPARISON OF SIMULATED ANNEALING, GENETIC ALGORITHM, AND RANDOM ALGORITHM.\\
+
+\section{Conclusions}
+
+
+
+%\bibliographystyle{plain}
+%\bibliography{571writeup}
+%\nocite{*}
+\end{document}
