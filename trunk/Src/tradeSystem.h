@@ -18,6 +18,8 @@
 #define DATE_LEN 8
 #define FORCEDEXIT 2
 #define ERRVAL -1
+#define TRAIN_YEARS 2
+#define TEST_YEARS 3
 
 typedef struct commodity
 {

@@ -103,10 +103,15 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         iSize, &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
     if(iError == ERRVAL)
     {
+        //free everything!
         free(adLow);
         free(adHigh);
         free(adOpen);
         free(adClose);
+        for (i = 0; i < iSize; i++)
+        {
+            if(aszDates[i] != NULL) free(aszDates[i]);
+        }
         free(aszDates);
         return iError;
     }
@@ -181,11 +186,11 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
         t++;
     }
 
-    if(!fDone)
-        fprintf(stderr, "tradeSystem: Never exited final trade (or entry window is still open!)\n");
+    //    if(!fDone)
+    //        fprintf(stderr, "tradeSystem: Never exited final trade (or entry window is still open!)\n");
 
     //compute profit!
-    dProfit = computeProfit(comCommodity.iType, dEntryPoints, dExitPoints, 
+    dProfit = computeProfit(comCommodity.iType, dEntryPoints, dExitPoints,
         comCommodity.dTickVal, comCommodity.dTickSize);
 
     //free everything!
@@ -208,42 +213,143 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
 }
 
 double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int iTrailStopWindow,
-    int iStopLossWindow, char* szEntryDate, char* szNoEntryDate, char* szExitDate)
+    int iStopLossWindow, char* szEntryDateMonthDay, char* szNoEntryDateMonthDay, char* szExitDateMonthDay)
 {
-
+    commod comCommodity;
     double dTotalProfit = 0;
     int iBaseYear;
     int iTotalYears;
     int iKey;
     int iNumYears;
     int iYear;
-    int i = 0;
+    int i;
+    int iError;
+    int iSize;
+    double* adOpen;
+    double* adClose;
+    double* adLow;
+    double* adHigh;
+    char** aszDates;
 
-    if(dPercentData < 0 || dPercentData > 1)
+    struct Date
     {
-        fprintf(stderr, "tradeSystem: Invalid data percentage\n");
-        return ERRVAL;
-    }
+        char szYMD[9];
+        char szMonthDay[5];
+        char szYear[5];
+    } dateEntry, dateNoEntry, dateExit, dateCommon;
 
     iKey = nameLookup(szName);
     if(iKey < 0) return ERRVAL;
 
-    iBaseYear = comDatabase[iKey].iYear;
-    iTotalYears = comDatabase[iKey].iNumYears;
+    if(dPercentData == TRAIN_YEARS)
+    {
 
-    iNumYears = iTotalYears * dPercentData;
+    }
+    else if(dPercentData == TEST_YEARS)
+    {
 
-    printf("total years for %s: %d\n", szName, iTotalYears);
-    printf("percentage requested: %lf, years computed: %d", dPercentData, iNumYears);
+    }
+    else
+    {
+        if(dPercentData < 0 || dPercentData > 1)
+        {
+            fprintf(stderr, "tradeSystem: Invalid data percentage\n");
+            return ERRVAL;
+        }
+        iBaseYear = comDatabase[iKey].iYear;
+        iTotalYears = comDatabase[iKey].iNumYears;
+        iNumYears = iTotalYears * dPercentData;
+    }
+
+
+    //    printf("total years for %s: %d\n", szName, iTotalYears);
+    //    printf("percentage requested: %lf, years computed: %d\n", dPercentData, iNumYears);
+
+    comCommodity.szName = szName;
+    memset(dateCommon.szYMD,~0,DATE_LEN); //guaranteed to be larger than any date
+    for(i = 0; i < iNumYears; i++)
+    {
+        comCommodity.iYear = iBaseYear + i;
+
+        iError = generateTradeData(comCommodity, &adLow, &adHigh, &adOpen, &adClose, &aszDates, &iSize);
+        if(iError == ERRVAL) return iError;
+        else //immediately free the ones we don't need
+        {
+            free(adLow);
+            free(adHigh);
+            free(adOpen);
+            free(adClose);
+        }
+        if(strncmp(aszDates[iSize-1], dateCommon.szYMD, DATE_LEN) < 0)
+        {
+            strncpy(dateCommon.szYMD,aszDates[iSize-1], DATE_LEN);
+        }
+        for (i = 0; i < iSize; i++)
+        {
+            if(aszDates[i] != NULL) free(aszDates[i]);
+        }
+        free(aszDates);
+    }
+
+    strncpy(dateCommon.szYear,dateCommon.szYMD,4);
+    strncpy(dateCommon.szMonthDay,dateCommon.szYMD+4,4);
+
+    strncpy(dateEntry.szMonthDay,szEntryDateMonthDay,4);
+    strncpy(dateNoEntry.szMonthDay,szNoEntryDateMonthDay,4);
+    strncpy(dateExit.szMonthDay,szExitDateMonthDay,4);
+
+
 
     for(i = 0; i < iNumYears; i++)
     {
         iYear = iBaseYear + i;
 
-        printf("calling tradeSystem with year: %d\n", iYear);
+        if (strncmp(dateCommon.szMonthDay,dateExit.szMonthDay,4) > 0)
+        {
+            snprintf(dateExit.szYear,4+1,"%d",atoi(dateCommon.szYear) + i);
+        }
+        else
+        {
+            snprintf(dateExit.szYear,4+1,"%d",atoi(dateCommon.szYear) - 1 + i);
+        }
+
+        if (strncmp(dateEntry.szMonthDay,dateExit.szMonthDay,4) < 0)
+        {
+            snprintf(dateEntry.szYear,4+1,"%s",dateExit.szYear);
+        }
+        else
+        {
+            snprintf(dateEntry.szYear,4+1,"%d",atoi(dateExit.szYear) - 1);
+        }
+
+        if (strncmp(dateNoEntry.szMonthDay,dateEntry.szMonthDay,4) > 0)
+        {
+            snprintf(dateNoEntry.szYear,4+1,"%s",dateEntry.szYear);
+        }
+        else
+        {
+            snprintf(dateNoEntry.szYear,4+1,"%d",atoi(dateEntry.szYear) + 1);
+        }
+
+        snprintf(dateEntry.szYMD,8+1,"%s%s",dateEntry.szYear,dateEntry.szMonthDay);
+        snprintf(dateNoEntry.szYMD,8+1,"%s%s",dateNoEntry.szYear,dateNoEntry.szMonthDay);
+        snprintf(dateExit.szYMD,8+1,"%s%s",dateExit.szYear,dateExit.szMonthDay);
+
+
+        //        printf("calling tradeSystem with year: %d\n", iYear);
+        //        printf("tradeSystem(%s, %d, %d, %d, %d, %s, %s, %s);",
+        //               szName,
+        //               iYear,
+        //               iEntryWindow,
+        //               iTrailStopWindow,
+        //               iStopLossWindow,
+        //               dateEntry.szYMD,
+        //               dateNoEntry.szYMD,
+        //               dateExit.szYMD);
 
         dTotalProfit += tradeSystem(szName, iYear, iEntryWindow, iTrailStopWindow,
-            iStopLossWindow, szEntryDate, szNoEntryDate, szExitDate);
+            iStopLossWindow, dateEntry.szYMD, dateNoEntry.szYMD, dateExit.szYMD);
+        //        printf("dTotalProfit = %lf\n",dTotalProfit);
     }
 
     return dTotalProfit;
@@ -352,7 +458,7 @@ int checkEnter(int iType, double dEntryChnl, double dLow, double dHigh, char* sz
 int inEntryWindow(char* szEntryDate, char* szNoEntryDate, char* szCurrDate)
 {
     // Returns -1 if before the entry window, 0 if in the entry window, 1, if passed.
-    
+
     if(strncmp(szCurrDate, szEntryDate, DATE_LEN) <= 0) return -1;
     else if(strncmp(szCurrDate, szNoEntryDate, DATE_LEN) <= 0) return 0;
     else return 1;
@@ -401,11 +507,11 @@ int checkExit(int iType, double dStopLoss, double dTrailStop, double dLow, doubl
         if(iType == SHORT)
         {
             //may exit due to stoploss
-            if(dStopLoss < dTrailStop) 
+            if(dStopLoss < dTrailStop)
                 dCloser = dStopLoss;
 
             //may exit due to trailStop
-            else 
+            else
             {
                 //do not exit due to trailStop, cause we'd lose money
                 if(dTrailStop > dEntryPoints)

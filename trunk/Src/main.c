@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "commodities.h"
+#include "sim.c"
 
 #define NUMARGS 9
 
 int main(int argc, char** argv)
 {
+    /*
     char* szName;
     double dPercent;
     int iYear;
@@ -20,7 +22,7 @@ int main(int argc, char** argv)
 
     if(argc != NUMARGS)
     {
-        fprintf(stderr, "Usage: %s <commodity name> <year | percent> <entry window> <trail stop window> " 
+        fprintf(stderr, "Usage: %s <commodity name> <year | percent> <entry window> <trail stop window> "
             "<stop loss window>\n\t<entry date> <no entry date> <exit date>\n", argv[0]);
         exit(1);
     }
@@ -54,6 +56,16 @@ int main(int argc, char** argv)
     printf("trail stop window: %d\nstop loss window: %d\n", iTrailStopWindow, iStopLossWindow);
     printf("entry date: %s\nno entry date: %s\nexit date: %s\n", szEntryDate, szNoEntryDate, szExitDate);
     printf("profit earned: %f\n", dProfit);
+    */
 
+    int i;
+    int iIterations = 1000;
+    double dProfit = 0;
+
+    for(i = 0; i < iIterations; i++)
+    {
+        dProfit = SimulatedAnnealing(i,"Jun_CL");
+        printf("%d\t%lf\n",i,dProfit);
+    }
     return 0;
 }
