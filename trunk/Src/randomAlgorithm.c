@@ -3,7 +3,7 @@
 #include "tradeSystem.h"
 
 
-int RandomAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize, int distType)
+double RandomAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize, int distType)
 {
     int iCurEntryWindow;
     int iCurTrailStopWindow;
@@ -13,38 +13,50 @@ int RandomAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize, i
     char szCurExitDate[5];
     double dCurProfit;
 
-    int iNextEntryWindow;
-    int iNextTrailStopWindow;
-    int iNextStopLossWindow;
-    char szNextEntryDate[5];
-    char szNextNoEntryDate[5];
-    char szNextExitDate[5];
-    double dNextProfit;
+    int iBestEntryWindow;
+    int iBestTrailStopWindow;
+    int iBestStopLossWindow;
+    char szBestEntryDate[5];
+    char szBestNoEntryDate[5];
+    char szBestExitDate[5];
+    double dBestProfit;
 
     int i;
 
-    Neighbor(&iCurEntryWindow,&iCurTrailStopWindow,&iCurStopLossWindow,
-             szCurEntryDate,szCurNoEntryDate,szCurExitDate,6,UNIFORM);
+    //set current and best to all uniformly random parameters
+    Neighbor(&iCurEntryWindow, &iCurTrailStopWindow, &iCurStopLossWindow,
+             szCurEntryDate, szCurNoEntryDate, szCurExitDate, 6,
+             UNIFORM);
     dCurProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
-                                 iCurEntryWindow, iCurTrailStopWindow, iCurStopLossWindow,
-                                 szCurEntryDate, szCurNoEntryDate, szCurExitDate);
+                                 iCurEntryWindow, iCurTrailStopWindow,
+                                 iCurStopLossWindow, szCurEntryDate,
+                                 szCurNoEntryDate, szCurExitDate);
+
+    iBestEntryWindow = iCurEntryWindow;
+    iBestTrailStopWindow = iCurTrailStopWindow;
+    iBestStopLossWindow = iCurStopLossWindow;
+    strcpy(szBestEntryDate, szCurEntryDate);
+    strcpy(szBestNoEntryDate, szCurNoEntryDate);
+    strcpy(szBestExitDate, szCurExitDate);
+    dBestProfit = dCurProfit;
+
     for (i = 0; i < iIterations; i++)
     {
-        Neighbor(&iNextEntryWindow,&iNextTrailStopWindow,&iNextStopLossWindow,
-                 szNextEntryDate,szNextNoEntryDate,szNextExitDate,
+        Neighbor(&iCurEntryWindow,&iCurTrailStopWindow,&iCurStopLossWindow,
+                 szCurEntryDate,szCurNoEntryDate,szCurExitDate,
                  iArgsToRandomize,distType);
-        dNextProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
-                                     iNextEntryWindow, iNextTrailStopWindow, iNextStopLossWindow,
-                                     szNextEntryDate, szNextNoEntryDate, szNextExitDate);
-        if (dNextProfit > dCurProfit)
+        dCurProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
+                                     iCurEntryWindow, iCurTrailStopWindow, iCurStopLossWindow,
+                                     szCurEntryDate, szCurNoEntryDate, szCurExitDate);
+        if (dCurProfit > dBestProfit)
         {
-            iCurEntryWindow = iNextEntryWindow;
-            iCurTrailStopWindow = iNextTrailStopWindow;
-            iCurStopLossWindow = iNextStopLossWindow;
-            strcpy(szNextEntryDate,szCurEntryDate);
-            strcpy(szNextNoEntryDate,szCurNoEntryDate);
-            strcpy(szNextExitDate,szCurExitDate);
-            dCurProfit = dNextProfit;
+            iBestEntryWindow = iCurEntryWindow;
+            iBestTrailStopWindow = iCurTrailStopWindow;
+            iBestStopLossWindow = iCurStopLossWindow;
+            strcpy(szBestEntryDate,szCurEntryDate);
+            strcpy(szBestNoEntryDate,szCurNoEntryDate);
+            strcpy(szBestExitDate,szCurExitDate);
+            dBestProfit = dCurProfit;
         }
     }
     dCurProfit = tradeSystemData(szCommodName,TEST_YEARS,
