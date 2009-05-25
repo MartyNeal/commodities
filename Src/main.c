@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "commodities.h"
-#include "sim.c"
 
 #define NUMARGS 9
 
@@ -59,13 +59,24 @@ int main(int argc, char** argv)
     */
 
     int i;
-    int iIterations = 1000;
-    double dProfit = 0;
+    int sumR;
+    int sumS;
+    int j;
+    int iIterations = 200;
+    time_t tTime;
+    srand(time(&tTime));
 
-    for(i = 0; i < iIterations; i++)
+    printf("i\tRandom\tSimulated\n");
+    for(i = 0; i < iIterations; i += 10)
     {
-        dProfit = SimulatedAnnealing(i,"Jun_CL");
-        printf("%d\t%lf\n",i,dProfit);
+        sumR = 0;
+        sumS = 0;
+        for(j = 0; j < 100; j++)
+        {
+            sumR += RandomAlgorithm(i,"Jun_CL",6,UNIFORM);
+            sumS += SimulatedAnnealing(i,"Jun_CL",6,NORMAL);
+        }
+        printf("%d\t%d\t%d\n",i,sumR/j,sumS/j);
     }
     return 0;
 }

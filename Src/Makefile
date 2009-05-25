@@ -1,6 +1,6 @@
 CC= gcc
-CFLAGS= -Wall -g -O0
-SOURCES= tradeSystem.c main.c genData.c
+CFLAGS= -Wall -g -O0 -lm
+SOURCES= tradeSystem.c main.c genData.c norm.c sim.c randomAlgorithm.c
 
 all: trade
 

@@ -92,17 +92,24 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     comCommodity.szName = szName;
     comCommodity.iYear = iYear;
     iError = lookupTypeTick(&comCommodity);
-    if(iError == ERRVAL) return iError;
-
+    if(iError == ERRVAL)
+    {
+        fprintf(stderr, "tradeSystem: lookupTypeTick failed\n");
+        return iError;
+    }
     //get trade data
     iError = generateTradeData(comCommodity, &adLow, &adHigh, &adOpen, &adClose, &aszDates, &iSize);
-    if(iError == ERRVAL) return iError;
-
+    if(iError == ERRVAL)
+    {
+        fprintf(stderr, "tradeSystem: generateTradeData failed\n");
+        return iError;
+    }
     //get channels
     iError = generateChannels(comCommodity, adLow, adHigh, iEntryWindow, iTrailStopWindow, iStopLossWindow,
         iSize, &adEntryChannel, &adTrailStopChannel, &adStopLossChannel);
     if(iError == ERRVAL)
     {
+        fprintf(stderr, "tradeSystem: generateChannels failed\n");
         //free everything!
         free(adLow);
         free(adHigh);
@@ -137,8 +144,12 @@ double tradeSystem(char* szName, int iYear, int iEntryWindow, int iTrailStopWind
     {
         //check for NA values
         iError = checkForNAValues(t, adEntryChannel, adTrailStopChannel, adStopLossChannel);
-        if(iError == ERRVAL) return iError;
-
+        if(iError == ERRVAL)
+        {
+            fprintf(stderr, "tradeSystem: checkForNAValues failed\n");
+            //Memory leak here!
+            return iError;
+        }
         //if we haven't entered
         if(!fStartDayOn)
         {
@@ -239,28 +250,31 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
     } dateEntry, dateNoEntry, dateExit, dateCommon;
 
     iKey = nameLookup(szName);
-    if(iKey < 0) return ERRVAL;
+    if(iKey < 0)
+    {
+        fprintf(stderr, "tradeSystem: could not fine %s\n",szName);
+        return ERRVAL;
+    }
+
+    iBaseYear = comDatabase[iKey].iYear;
+    iTotalYears = comDatabase[iKey].iNumYears;
 
     if(dPercentData == TRAIN_YEARS)
     {
-
+        dPercentData = TRAIN_YEARS_PERCENTAGE;
     }
     else if(dPercentData == TEST_YEARS)
     {
-
+        iBaseYear += iTotalYears*TRAIN_YEARS_PERCENTAGE;
+        dPercentData = TEST_YEARS_PERCENTAGE;
     }
-    else
+
+    if(dPercentData < 0 || dPercentData > 1)
     {
-        if(dPercentData < 0 || dPercentData > 1)
-        {
-            fprintf(stderr, "tradeSystem: Invalid data percentage\n");
-            return ERRVAL;
-        }
-        iBaseYear = comDatabase[iKey].iYear;
-        iTotalYears = comDatabase[iKey].iNumYears;
-        iNumYears = iTotalYears * dPercentData;
+        fprintf(stderr, "tradeSystem: Invalid data percentage\n");
+        return ERRVAL;
     }
-
+    iNumYears = iTotalYears * dPercentData;
 
     //    printf("total years for %s: %d\n", szName, iTotalYears);
     //    printf("percentage requested: %lf, years computed: %d\n", dPercentData, iNumYears);
@@ -272,7 +286,11 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
         comCommodity.iYear = iBaseYear + i;
 
         iError = generateTradeData(comCommodity, &adLow, &adHigh, &adOpen, &adClose, &aszDates, &iSize);
-        if(iError == ERRVAL) return iError;
+        if(iError == ERRVAL)
+        {
+            fprintf(stderr, "tradeSystem: generateTradeData failed\n");
+            return iError;
+        }
         else //immediately free the ones we don't need
         {
             free(adLow);
@@ -297,8 +315,6 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow, int 
     strncpy(dateEntry.szMonthDay,szEntryDateMonthDay,4);
     strncpy(dateNoEntry.szMonthDay,szNoEntryDateMonthDay,4);
     strncpy(dateExit.szMonthDay,szExitDateMonthDay,4);
-
-
 
     for(i = 0; i < iNumYears; i++)
     {
