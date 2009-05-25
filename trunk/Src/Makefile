@@ -10,5 +10,8 @@ trade:  ${SOURCES}
 #debug:  ${SOURCES}
 #	${CC} -o trade -g ${CFLAGS} ${SOURCES}
 
+ptrade: ${SOURCES}
+	mpicc -Wall -o trade ${SOURCES} -lm
+
 clean:
 	rm -f *.o *~ trade
