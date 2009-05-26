@@ -200,7 +200,7 @@ void Neighbor(int* piCurEntryWindow, int* piCurTrailStopWindow,
               int iArgsToRandomize, int distType)
 {
     int i;
-    int* pTemp;
+    int* piTemp;
     int r;
     int piCurEntryDate[] = {DateToDays(szCurEntryDate)};
     int piCurNoEntryDate[] = {DateToDays(szCurNoEntryDate)};
@@ -213,10 +213,9 @@ void Neighbor(int* piCurEntryWindow, int* piCurTrailStopWindow,
     for (i = 0; i < iArgsToRandomize; i++)
     {
         r = (int)random()%(6-i)+i;
-        pTemp = ppiArgs[r];
+        piTemp = ppiArgs[r];
         ppiArgs[r] = ppiArgs[i];
-        ppiArgs[i] = pTemp;
-
+        ppiArgs[i] = piTemp;
         if (ppiArgs[i] == piCurEntryWindow ||
             ppiArgs[i] == piCurTrailStopWindow ||
             ppiArgs[i] == piCurStopLossWindow)
