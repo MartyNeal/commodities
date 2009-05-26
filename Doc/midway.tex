@@ -1,17 +1,18 @@
-\documentclass[10pt]{article}
+\documentclass[12pt]{article}
 \usepackage{graphicx, url}
-\usepackage[left=2cm,top=1cm,right=2.5cm,bottom=1cm,nohead,nofoot]{geometry}
+\usepackage{listings,color}
+\usepackage[left=2cm,top=1.5cm,right=2.5cm,bottom=1cm]{geometry}
 \setlength{\parskip}{5mm plus5mm minus2mm}
 \setlength{\parindent}{0mm}
+
+
+\begin{document}
 
 \title{Machine learning optimal parameters for a channel breakout system for trading
 commodities}
 \author{Martin Neal\\
   Becky Engley}
 \date{\today}
-
-\begin{document}
-
 \maketitle
 
 \section{Introduction}
@@ -53,7 +54,11 @@ This paper aims to data mine commodity market prices, in order to learn better
 parameters for Momsen's system. We use two machine learning algorithms to
 search the parameter space; simulated annealing, and a genetic algorithm.
 
+\vspace{-15pt}
+
 \section{Related Work}
+
+\vspace{-5pt}
 
 Momsen's book, Superstar Seasonals, describes his channel breakout system as a
 model for predicting uptrends and downtrends.  According to his system, a
@@ -91,7 +96,6 @@ Over the past thirty years, Momsen has traded this system, with outstanding
 results.  We intend to extend his work by machine learning optimal values for
 the six trading parameters.
 
-
 \section{Methods}
 
 Local search algorithms are used to maximize an objective function. Our
@@ -101,14 +105,13 @@ earned. Optimal paramers maximize the profit earned as a result of trading the
 system. We first discuss the algorithm for our objective function. Then, we
 present the search algorithms that we will use to explore the parameter space.
 
-
 \subsection{Trading the System}
 
 The channel breakout system processes financial market data for an individual
 commodity, over a single contract year.  We describe our algorithm for the
 channel breakout system below, along with our data set.
 
-
+\vspace{25pt}
 \subsubsection{Data Set}
 
 We have financial market data for fourteen commodities over a period of thirty
@@ -117,15 +120,13 @@ comprises a single data point.  We have approximately thirty data points for
 each commodity.  The commodities include live cattle, pork bellies, corn,
 wheat, lean hogs, crude oil, unleaded gasoline, heating oil, and orange juice.
 Some commodities are traded during multiple seasons.  The data includes open,
-high, low, and closing values for each commodity on every trading day.
-
+high, low, and closing values for each commodity for every trading day.
 
 The data set will be partitioned into two sets. For each commodity, we will
 reserve one third of the data points for testing; the remaining two thirds will
 be used to train the system. We will use the earlier years of data for
 training, and the more recent years for testing. We will not reserve any data
 for validation, as we do not intend to validate our predetermined model.
-
 
 \subsubsection{The Channel Breakout System}
 
@@ -135,6 +136,7 @@ is our objective function, the return value of which we are trying to maximize.
 It is used as the $value()$ function for the Simulated Annealing algorithm, and
 the $fitness()$ function for the Genetic algorithm, both defined in a later
 section.
+\vspace{25pt}
 
 \setlength{\parindent}{5mm}
 \indent TradeSystem(entry\_window\_open, entry\_window\_close, exit\_date,\\
@@ -147,7 +149,8 @@ section.
 \indent \indent \indent \indent \indent entry\_price $\leftarrow$ current\_price\\
 \indent \indent \indent \indent \indent stop\_loss\_value $\leftarrow$ stop\_loss\_channel[current\_date]\\
 \indent \indent \indent else\\
-\indent \indent \indent \indent if(trail\_stop\_channel is crossed OR stop\_loss\_value is crossed OR current\_date = exit\_date)\\
+\indent \indent \indent \indent if(trail\_stop\_channel is crossed OR stop\_loss\_value is crossed OR\\
+\indent \indent \indent \indent \indent current\_date = exit\_date)\\\\
 \indent \indent \indent \indent \indent in\_trade $\leftarrow$ FALSE\\
 \indent \indent \indent \indent \indent exit\_price $\leftarrow$ current\_price\\
 \indent \indent \indent current\_date $\leftarrow$ current\_date + 1\\\\
@@ -155,6 +158,7 @@ section.
 \indent \indent return profit\\
 \setlength{\parindent}{0mm}
 
+\pagebreak
 We may repeatedly enter and then exit a trade many times over the course of one
 trading year. When in a trade, we check every day, to determine if we should
 exit.  When not currently in a trade, we check to determine if we should enter,
@@ -165,7 +169,6 @@ the value at which we crossed the closer of the trail-stop channel and the
 stop-loss value. The profit for this trade is the difference between the entry
 and exit prices.
 
-
 \subsection{Searching the Parameter Space}
 
 Optimal parameters maximize the profit earned as a result of trading the
@@ -173,8 +176,6 @@ system.  We will approach this optimization problem using two different machine
 learning techniques: simulated annealing, and genetic algorithms.  Below we
 present these two algorithms, along with an algorithm for a random learner,
 which we will use as a baseline comparison.
-
-\pagebreak
 
 \subsubsection{Simulated Annealing}
 
@@ -186,6 +187,7 @@ Simulated Annealing combines these approaches, yielding both efficiency and
 completeness.  We present the psuedo-code for the Simulated Annealing algorithm
 below.
 
+\vspace{25pt}
 \setlength{\parindent}{5mm}
 \indent SimulatedAnnealing(number\_iterations)\\\\
 \indent \indent current $\leftarrow$ 6 random parameter values\\
@@ -202,6 +204,7 @@ below.
 \indent \indent return max\\
 \setlength{\parindent}{0mm}
 
+\pagebreak
 The $value()$ function trades the system with the six parameters and returns the
 profit made (or lost).  Current and next are both nodes.  In this context, a
 node is a set of values for the six parameters. $f(t)$ is a linearly decreasing
@@ -215,12 +218,8 @@ algorithm.  Our $successor()$ function adjusts $n$ of the six parameters in curr
 by a random amount, $\delta$, which may be sampled from one of three
 distributions: a uniformly random distribution, a normal distribution, or a
 constant distribution of size one.  The parameter $dist\_type$ specifies the
-distribution to use.  We are currently using the June crude oil commodity to
-experiment with these variations. We are trying all three distributions with
-$n$ = 1, 3 and 6.  Once we determine the best distribution and the best value
-of $n$, we will train and test all fourteen commodities.
+distribution to use.
 
-\pagebreak
 
 \subsubsection{Genetic Algorithm}
 
@@ -233,6 +232,7 @@ unfit individuals from the population.  The $fitness()$ function returns the
 profit earned by trading the channel breakout system using the individual's six
 parameters.  We present the psuedo-code for the Genetic Algorithm below.
 
+\vspace{10pt}
 \setlength{\parindent}{5mm}
 \indent Genetic(number\_iterations)\\\\
 \indent\indent population $\leftarrow$ createPopulation(size)\\\\
@@ -264,6 +264,7 @@ parameters). Unlike simulated annealing, our random walk algorithm has no
 preference for climbing uphill. We present the psuedo-code for our random walk
 algorithm below.
 
+\vspace{10pt}
 \setlength{\parindent}{5mm}
 \indent RandomWalk(number\_iterations)\\\\
 \indent \indent current $\leftarrow$ 6 random parameter values\\
@@ -277,25 +278,81 @@ algorithm below.
 
 As with simulated annealing, the $successor()$ function adjusts $n$ of the six
 parameters in current by a random amount, $\delta$, which may be sampled from
-one of three distributions: a uniformly random distribution, a normal
-distribution, or a constant distribution of size one. We are currently
-experimenting with all three distributions, for $n$ = 1, 3 and 6. Once we
-determine the best distribution and the best value of $n$, we will use our
-random walk algorithm to train and test all fourteen commodities.
+the same three distributions.
+
+
 
 \section{Experiments and Results}
 
-We will evaluate our learning systems using two types of critera; the total amount
-of profit earned, and the rate at which the system learned to increase the
-profit. We will present the results for each type of criteria below.
 
-\section{Profits}
+We begin by experimenting with variations on each of our learning algorithms. We
+will investigate the effects of differing types of successor functions, and
+experiment with modifications to our genetic algorithm, including altering the
+initial population size, the probability of mutation, and details of the
+reproduction function. After determining the best set of variations for each
+learning algorithm, we will use our algorithms to search for the optimal
+parameters for each commodity.
 
-After training and testing all fourteen commodities, using our three different learning systems, we present 
 
-Below are the parameters obtained for each commodities using three
-systems, simulated annealing, genetic algorithm, along with Momsens's
-parameters.  Also indicated is the profits obtained using the parameters.
+\subsection{Successor Function}
+
+A successor function takes in a state (i.e., a set of six parameters), and
+modifies it in some way to produce a new state.  Our simulated annealing,
+genetic, and random walk algorithms all use a successor function.  In the case
+of our genetic algorithm, the successor function is our mutate function, which
+takes in an individual, and mutates it to produce a slightly different
+individual.
+
+Our successor functions can be defined by two components, a distribution type,
+and a number of parameters to modify, $n$. The parameters are modified by a
+random amount $\delta$, which may be sampled from one of three distributions: a
+uniformly random distribution, a normal distribution, or a constant distribution
+of size one. We are currently using the June crude oil commodity to experiment
+with all three distributions for $n$ = 1, 3 and 6.
+
+
+We will conduct twenty-seven experiments. An experiment consists of a learning
+algorithm, a distribution type, and a number of parameters to modify. For each
+experiment, we will train the learner, using the earliest two thirds of the June
+crude oil data. In order to study the learning speed for each experiment, we
+will train the learner, using an increasing number of iterations. We will range
+from 10 iterations to 200, in steps of 10, recording the best parameters at each
+step. We will evaluate the set of best parameters, using the testing data, and
+record the profit, for each step. To minimize noise, we will take an average of
+100 trials at each step. Below we present plots of the profit earned as a
+function of the number of iterations, for each learning algorithm.
+
+
+WE WILL INCLUDE THREE PLOTS OF PROFIT VS. NUMBER OF ITERATIONS, ONE FOR EACH
+LEARNING ALGORITHM. EACH PLOT WILL HAVE 9 LINES, REPRESENTING 9 DIFFERENT
+SUCCESSOR VARIATIONS FOR THAT LEARNING ALGORITHM.
+
+
+\subsection{Genetic Algorithm variations}
+
+We intend to experiment with the mutation probability, population size, and
+reproduction function, for our genetic algorithm. Below we present plots of the
+profit earned as a function of each of the above variations.
+
+PLOTS OF: PROFIT EARNED VS. MUTATION PROBABILITY, PROFIT EARNED VS. POPULATION
+SIZE AND PROFIT EARNED VS. REPRODUCTION FUNCTION
+
+
+
+\subsection{Finding Optimal Parameters}
+
+
+After determining the successor functions and genetic algorithm variations, we
+will use each learning algorithm to find optimal parameters for each of the
+fourteen commodities. For each commodity, we will first train the learner over
+300 iterations, recording the most profitable set of six parameters. We will
+then evaluate this set of parameters, using the testing data.
+
+Below we will present the parameters obtained from each of our three learning
+algorithms, along with Momsen's published parameter values, for all fourteen
+commodities. For each set of parameters, we will report the profit earned after
+evaluating the parameters with the testing data.
+
 
 NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
 
@@ -305,6 +362,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Live Cattle & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -314,6 +372,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Pork Bellies & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -323,6 +382,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Corn & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -332,6 +392,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Wheat & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -341,6 +402,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -350,6 +412,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -359,6 +422,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Soy Beans & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -368,6 +432,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -377,6 +442,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Unleaded Gas & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -386,6 +452,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -395,6 +462,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Heating Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -404,6 +472,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -413,6 +482,7 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
@@ -422,25 +492,22 @@ NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
   Orange Juice & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
   Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
   Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
+  Random Walk & a & b & c & d & e & f & \$ \\ \hline
   Momsen &  a & b & c & d & e & f & \$ \\ \hline
 \end{tabular}
 
-\subsection{Learning Speed}
-
-Here is a chart of the average profit over all commodities as a function of
-time.  Each unit of time represents an epoch or an iteration through the main
-loop of the algorithm during training over the training data.  The y-axis is the
-total profit earned from trading the system using the parameters on the testing
-data.
-
-PLOT AND DISCUSSION OF PLOT GOES HERE.\\
-COMPARISON OF SIMULATED ANNEALING, GENETIC ALGORITHM, AND RANDOM ALGORITHM.\\
-
 \section{Conclusions}
 
+We intend to compare the learning rates for each of our three learning
+algorithms. We hope to find that simulated annealing and our genetic algorithm
+learn to increase the profit, more rapidly than our random walk algorithm. We
+will also compare the final parameters obtained for each of the learning
+algorithms to Momsen's published parameters. We hope to find more profitable
+parameter's than Momsen's.
 
 
 %\bibliographystyle{plain}
 %\bibliography{571writeup}
 %\nocite{*}
 \end{document}
+\end
