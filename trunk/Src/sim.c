@@ -183,7 +183,7 @@ int Randomize(int* piCur, int iMin, int iMax, int distType)
             *piCur = (int)(rnorm()*iMax/STDDEV+*piCur); //an STDDEV of 90 days
             break;
         case CONSTANT:
-            *piCur = random() > 0 ? 1 : -1 + *piCur; // move only by one
+            *piCur = random()%2 > 0 ? 1 : -1 + *piCur; // move only by one
             break;
         default:
             fprintf(stderr,"ERROR:  incorrect distType (%d)\n",distType);
@@ -212,7 +212,7 @@ void Neighbor(int* piCurEntryWindow, int* piCurTrailStopWindow,
 
     for (i = 0; i < iArgsToRandomize; i++)
     {
-        r = random()%(6-i)+i;
+        r = (int)random()%(6-i)+i;
         pTemp = ppiArgs[r];
         ppiArgs[r] = ppiArgs[i];
         ppiArgs[i] = pTemp;
@@ -258,5 +258,5 @@ void DaysToDate(char* szDate, int iDay)
         iDay -= iDaysInMonths[iMonth++];
     }
 
-    sprintf(szDate,"%d%d",++iMonth,iDay);
+    sprintf(szDate,"%.2d%.2d",++iMonth,iDay);
 }
