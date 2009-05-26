@@ -101,7 +101,7 @@ the six trading parameters.
 Local search algorithms are used to maximize an objective function. Our
 objective function is our algorithm for the channel breakout system, which
 takes the six trading parameters as input, and returns the profit
-earned. Optimal paramers maximize the profit earned as a result of trading the
+earned. Optimal parameters maximize the profit earned as a result of trading the
 system. We first discuss the algorithm for our objective function. Then, we
 present the search algorithms that we will use to explore the parameter space.
 
@@ -209,16 +209,16 @@ The $value()$ function trades the system with the six parameters and returns the
 profit made (or lost).  Current and next are both nodes.  In this context, a
 node is a set of values for the six parameters. $f(t)$ is a linearly decreasing
 function of time; it decreases the probability of downward steps as time
-increases. $P(\Delta E)$ gives the probability of $\Delta E$ occuring. We
-compute $P(\Delta E)$ using a normal distribution based on the previous values
-for $\Delta E$.
+increases. $P(\Delta E)$ is given by the p-value for $\Delta E$, from a normal
+distribution.  We use previous values of $\Delta E$ to compute the mean and
+standard deviation for the normal distribution.
 
 The choice of $successor()$ function greatly affects the learning speed of the
-algorithm.  Our $successor()$ function adjusts $n$ of the six parameters in current
-by a random amount, $\delta$, which may be sampled from one of three
+algorithm.  Our $successor()$ function adjusts $n$ of the six parameters in
+current by a random amount, $\delta$, which may be sampled from one of three
 distributions: a uniformly random distribution, a normal distribution, or a
-constant distribution of size one.  The parameter $dist\_type$ specifies the
-distribution to use.
+constant distribution (i.e., $\delta$=1).  The parameter $dist\_type$ specifies
+the distribution to use.
 
 
 \subsubsection{Genetic Algorithm}
@@ -238,12 +238,12 @@ parameters.  We present the psuedo-code for the Genetic Algorithm below.
 \indent\indent population $\leftarrow$ createPopulation(size)\\\\
 \indent \indent for t $\leftarrow$ 1 to number\_iterations\\
 \indent \indent \indent for i $\leftarrow$ 1 to size(population)\\\\
-\indent \indent \indent \indent parents $\leftarrow$ random-subset(population, size)\\
+\indent \indent \indent \indent parents $\leftarrow$ randomSubset(population, size)\\
 \indent \indent \indent \indent children $\leftarrow$ reproduce(parents)\\
 \indent \indent \indent \indent children $\leftarrow$ mutate(children) with small random probability\\
 \indent \indent \indent \indent population $\leftarrow$ add(population, children)\\\\
 \indent \indent \indent population $\leftarrow$ cull(population, threshold)\\\\
-\indent \indent return best-individual(population)\\
+\indent \indent return bestIndividual(population)\\
 \setlength{\parindent}{0mm}
 
 This generic algorithm leaves a lot of room for experimentation. The initial
@@ -257,12 +257,11 @@ with many of these variations.
 
 \subsubsection{Random Walk}
 
-Here we describe our random walk algorithm for use as a baseline comparison.
-The algorithm is similar to simulated annealing, in that the next node is
-chosen via a $successor()$ function (where again, a node is a set of six
-parameters). Unlike simulated annealing, our random walk algorithm has no
-preference for climbing uphill. We present the psuedo-code for our random walk
-algorithm below.
+Here we describe our random walk algorithm.  The algorithm is similar to
+simulated annealing, in that the next node is chosen via a $successor()$
+function (where again, a node is a set of six parameters). Unlike simulated
+annealing, our random walk algorithm has no preference for climbing uphill. We
+present the psuedo-code for the algorithm below.
 
 \vspace{10pt}
 \setlength{\parindent}{5mm}
@@ -286,9 +285,9 @@ the same three distributions.
 
 
 We begin by experimenting with variations on each of our learning algorithms. We
-will investigate the effects of differing types of successor functions, and
-experiment with modifications to our genetic algorithm, including altering the
-initial population size, the probability of mutation, and details of the
+will investigate the effects of differing types of successor functions. We will
+also experiment with modifications to our genetic algorithm by altering
+the initial population size, the probability of mutation, and details of the
 reproduction function. After determining the best set of variations for each
 learning algorithm, we will use our algorithms to search for the optimal
 parameters for each commodity.
@@ -296,8 +295,8 @@ parameters for each commodity.
 
 \subsection{Successor Function}
 
-A successor function takes in a state (i.e., a set of six parameters), and
-modifies it in some way to produce a new state.  Our simulated annealing,
+A successor function takes in a node (i.e., a set of six parameters), and
+modifies it in some way to produce a new node.  Our simulated annealing,
 genetic, and random walk algorithms all use a successor function.  In the case
 of our genetic algorithm, the successor function is our mutate function, which
 takes in an individual, and mutates it to produce a slightly different
@@ -307,7 +306,7 @@ Our successor functions can be defined by two components, a distribution type,
 and a number of parameters to modify, $n$. The parameters are modified by a
 random amount $\delta$, which may be sampled from one of three distributions: a
 uniformly random distribution, a normal distribution, or a constant distribution
-of size one. We are currently using the June crude oil commodity to experiment
+($\delta$=1). We are currently using the June crude oil commodity to experiment
 with all three distributions for $n$ = 1, 3 and 6.
 
 
@@ -316,11 +315,12 @@ algorithm, a distribution type, and a number of parameters to modify. For each
 experiment, we will train the learner, using the earliest two thirds of the June
 crude oil data. In order to study the learning speed for each experiment, we
 will train the learner, using an increasing number of iterations. We will range
-from 10 iterations to 200, in steps of 10, recording the best parameters at each
-step. We will evaluate the set of best parameters, using the testing data, and
-record the profit, for each step. To minimize noise, we will take an average of
-100 trials at each step. Below we present plots of the profit earned as a
-function of the number of iterations, for each learning algorithm.
+from 10 to 200 iterations, in steps of 10, recording the best parameters seen
+thus far, at each step. We will evaluate the set of best parameters, using the
+testing data, and record the profit, for each step. To minimize noise, we will
+take an average of 100 trials at each step. Below we will present plots of the
+profit earned as a function of the number of iterations, for each learning
+algorithm.
 
 
 WE WILL INCLUDE THREE PLOTS OF PROFIT VS. NUMBER OF ITERATIONS, ONE FOR EACH
@@ -331,8 +331,8 @@ SUCCESSOR VARIATIONS FOR THAT LEARNING ALGORITHM.
 \subsection{Genetic Algorithm variations}
 
 We intend to experiment with the mutation probability, population size, and
-reproduction function, for our genetic algorithm. Below we present plots of the
-profit earned as a function of each of the above variations.
+reproduction function, for our genetic algorithm. Below we will present plots of
+the profit earned as a function of each of the above variations.
 
 PLOTS OF: PROFIT EARNED VS. MUTATION PROBABILITY, PROFIT EARNED VS. POPULATION
 SIZE AND PROFIT EARNED VS. REPRODUCTION FUNCTION
@@ -351,7 +351,7 @@ then evaluate this set of parameters, using the testing data.
 Below we will present the parameters obtained from each of our three learning
 algorithms, along with Momsen's published parameter values, for all fourteen
 commodities. For each set of parameters, we will report the profit earned after
-evaluating the parameters with the testing data.
+evaluating them with the testing data.
 
 
 NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
@@ -506,8 +506,8 @@ algorithms to Momsen's published parameters. We hope to find more profitable
 parameter's than Momsen's.
 
 
-%\bibliographystyle{plain}
-%\bibliography{571writeup}
-%\nocite{*}
+\bibliographystyle{plain}
+\bibliography{midway}
+\nocite{*}
 \end{document}
 \end
