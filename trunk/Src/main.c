@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     srand(time(&tTime));
 
     experiment aeExperiments[] = {
-        {&SimulatedAnnealing,UNIFORM,1,"Jun_CL",20,10,100,"SimulatedAnnealing_UNIFORM_1_Jun_CL_200_10_100.dat"},
+        {&SimulatedAnnealing,UNIFORM,1,"Jun_CL",200,10,100,"SimulatedAnnealing_UNIFORM_1_Jun_CL_200_10_100.dat"},
         {&SimulatedAnnealing,UNIFORM,3,"Jun_CL",200,10,100,"SimulatedAnnealing_UNIFORM_3_Jun_CL_200_10_100.dat"},
         {&SimulatedAnnealing,UNIFORM,6,"Jun_CL",200,10,100,"SimulatedAnnealing_UNIFORM_6_Jun_CL_200_10_100.dat"},
         {&SimulatedAnnealing,NORMAL,1,"Jun_CL",200,10,100,"SimulatedAnnealing_NORMAL_1_Jun_CL_200_10_100.dat"},
