@@ -1,7 +1,12 @@
+/*!
+  \file    learner.c
+  \brief   Helper functions shared by the learning functions
+  \author  Becky Engley and Martin Neal
+  \date    May 2009
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include "tradeSystem.h"
 
 
@@ -12,7 +17,6 @@ int Randomize(int* piCur, int iMin, int iMax, int distType);
 int DateToDays(char* szDate);
 
 void DaysToDate(char* szDate, int iDay);
-
 
 /* ------------------------------- utility functions ------------------------ */
 
@@ -32,7 +36,7 @@ int Randomize(int* piCur, int iMin, int iMax, int distType)
             *piCur = random()%2 > 0 ? 1 : -1 + *piCur; // move only by one
             break;
         default:
-            fprintf(stderr,"ERROR:  incorrect distType (%d)\n",distType);
+            FPRINTE(stderr,"Incorrect distType (%d)\n",distType);
             return ERRVAL;
         }
     }
