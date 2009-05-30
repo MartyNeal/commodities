@@ -1,12 +1,18 @@
+/*!
+  \file    genData.c
+  \brief   Functions for reading commodity data and generating the channels
+  \author  Becky Engley and Martin Neal
+  \date    May 2009
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include "tradeSystem.h"
-/*
+
+/*!
   MAX_BUFFER is the amount to read in from an input file at a time.  Generally,
   this should be set as high as possible to achieve the best performance.
 */
@@ -33,37 +39,37 @@ int generateTradeData(commod comCommodity,
 
     if (!padLow)
     {
-        fprintf(stderr,"padLow was null");
+        FPRINTE(stderr,"padLow was null\n");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padHigh)
     {
-        fprintf(stderr,"padHigh was null");
+        FPRINTE(stderr,"padHigh was null\n");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padOpen)
     {
-        fprintf(stderr,"padOpen was null");
+        FPRINTE(stderr,"padOpen was null\n");
         iRet = ERRVAL;
         goto exit;
     }
     if (!padClose)
     {
-        fprintf(stderr,"padClose was null");
+        FPRINTE(stderr,"padClose was null\n");
         iRet = ERRVAL;
         goto exit;
     }
     if (!paszDates)
     {
-        fprintf(stderr,"paszDates was null");
+        FPRINTE(stderr,"paszDates was null\n");
         iRet = ERRVAL;
         goto exit;
     }
     if (!piSize)
     {
-        fprintf(stderr,"piSize was null");
+        FPRINTE(stderr,"piSize was null\n");
         iRet = ERRVAL;
         goto exit;
     }
@@ -82,7 +88,7 @@ int generateTradeData(commod comCommodity,
                  comCommodity.szName,
                  comCommodity.iYear))
     {
-        fprintf(stderr,"snprintf failed");
+        FPRINTE(stderr,"snprintf failed\n");
         iRet = ERRVAL;
         goto exit;
     }
@@ -90,42 +96,42 @@ int generateTradeData(commod comCommodity,
     fdInFile = open(szPathname, O_RDONLY);
     if(fdInFile == ERRVAL)
     {
-        fprintf(stderr,"open failed");
+        FPRINTE(stderr,"ERROR:  failed to open %s\n",szPathname);
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padOpen = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padOpen failed");
+        FPRINTE(stderr,"malloc *padOpen failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padHigh = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padHigh failed");
+        FPRINTE(stderr,"malloc *padHigh failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padLow = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padLow failed");
+        FPRINTE(stderr,"malloc *padLow failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padClose = (double*)malloc(MAX_BUFFER*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padClose failed");
+        FPRINTE(stderr,"malloc *padClose failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*paszDates = (char**)malloc(MAX_BUFFER*sizeof(char*)))))
     {
-        fprintf(stderr,"malloc *paszDates failed");
+        FPRINTE(stderr,"malloc *paszDates failed\n");
         iRet = ERRVAL;
         goto exit;
     }
@@ -140,7 +146,7 @@ int generateTradeData(commod comCommodity,
     //verify that the file contains this header
     if(sscanf(szReadBuf,"Date,Open,High,Low,Close") == EOF)
     {
-        fprintf(stderr,"scanf didn't find any headers when it should have");
+        FPRINTE(stderr,"scanf didn't find any headers when it should have\n");
         iRet = ERRVAL;
         goto exit;
     }
@@ -200,10 +206,12 @@ int generateTradeData(commod comCommodity,
                     szCurLine = szReadBuf+iIndex+1;
                     break;
                 default:
-                    fprintf(stderr,"szCurLine = %s\n",szCurLine);
-                    fprintf(stderr,"*piSize = %d\n",*piSize);
-                    fprintf(stderr,"iVal = %d\n",iVal);
-                    fprintf(stderr,"sscanf returned an incorrect value");
+                    FPRINTE(stderr,"sscanf returned an incorrect value\n\
+                                   szPathname = %s\n\
+                                   szCurLine = %s\n\
+                                   *piSize = %d\n\
+                                   iVal = %d\n",
+                            szPathname, szCurLine, *piSize, iVal);
                     iRet = ERRVAL;
                     goto exit;
                 }
@@ -276,35 +284,35 @@ int generateChannels(commod comCommodity,
 
     if (!padEntryChannel)
     {
-        fprintf(stderr,"padEntryChannel was null");
+        FPRINTE(stderr,"padEntryChannel was null\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!padTrailStopChannel)
     {
-        fprintf(stderr,"padTrailStopChannel was null");
+        FPRINTE(stderr,"padTrailStopChannel was null\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!padStopLossChannel)
     {
-        fprintf(stderr,"padStopLossChannel was null");
+        FPRINTE(stderr,"padStopLossChannel was null\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!adLow)
     {
-        fprintf(stderr,"adLow was null");
+        FPRINTE(stderr,"adLow was null\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if (!adHigh)
     {
-        fprintf(stderr,"adHigh was null");
+        FPRINTE(stderr,"adHigh was null\n");
         iRet = ERRVAL;
         goto exit;
     }
@@ -315,21 +323,21 @@ int generateChannels(commod comCommodity,
 
     if(!((*padEntryChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padEntryChannel failed");
+        FPRINTE(stderr,"malloc *padEntryChannel failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padTrailStopChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padTrailStopChannel failed");
+        FPRINTE(stderr,"malloc *padTrailStopChannel failed\n");
         iRet = ERRVAL;
         goto exit;
     }
 
     if(!((*padStopLossChannel = (double*)malloc(iSize*sizeof(double)))))
     {
-        fprintf(stderr,"malloc *padStopLossChannel failed");
+        FPRINTE(stderr,"malloc *padStopLossChannel failed\n");
         iRet = ERRVAL;
         goto exit;
     }
