@@ -1,3 +1,11 @@
+/*!
+  \file    norm.c
+  \brief   Functions immitating R's pnorm and rnorm functions
+  \author  Becky Engley and Martin Neal
+  \date    May 2009
+*/
+
+
 #include <stdlib.h>
 #include <math.h>
 
