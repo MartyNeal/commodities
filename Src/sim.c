@@ -1,3 +1,10 @@
+/*!
+  \file    sim.c
+  \brief   Algorithm for a learning via simmulated annealing
+  \author  Becky Engley and Martin Neal
+  \date    May 2009
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,58 +23,52 @@ double LinearCoolingFunction(int iCurrentIteration, int iTotalIterations);
 
 /* ----------------------------- Simulated Annealing ------------------------ */
 
-double SimulatedAnnealing(int iIterations, char* szCommodName, int iArgsToRandomize, int distType)
+int SimulatedAnnealing(int iIterations,char* szCommodName, int iArgsToRandomize,
+                       int distType, double dResults[], int iResultSize)
 {
-    int iCurEntryWindow;
-    int iCurTrailStopWindow;
-    int iCurStopLossWindow;
-    char szCurEntryDate[5];
-    char szCurNoEntryDate[5];
-    char szCurExitDate[5];
-    double dCurProfit;
+    node nodeCur, nodeNext, nodeBest;
 
-    int iNextEntryWindow;
-    int iNextTrailStopWindow;
-    int iNextStopLossWindow;
-    char szNextEntryDate[5];
-    char szNextNoEntryDate[5];
-    char szNextExitDate[5];
-    double dNextProfit;
-
-    int iBestEntryWindow;
-    int iBestTrailStopWindow;
-    int iBestStopLossWindow;
-    char szBestEntryDate[5];
-    char szBestNoEntryDate[5];
-    char szBestExitDate[5];
-    double dBestProfit;
-
-    int i;
+    int i, iStepSize;
     double (*CoolingFunction)(int, int) = &LinearCoolingFunction;
-    double dDeltaE;
-    double dDeltaM;
-    double mean;
-    double var;
-    double M2;
-    double p;
-    double r;
+    double dDeltaE, dDeltaM, mean, var, M2, p, r;
+
+    if (iResultSize == 1)
+    {
+        FPRINTE(stderr,"iResultSize can't be 1\n");
+        return ERRVAL;
+    }
+
+    if (iResultSize > iIterations + 1)
+    {
+        FPRINTE(stderr,"iResultSize can't be greater than iIterations\n");
+        return ERRVAL;
+    }
+
+    iStepSize = iIterations / (iResultSize - 1);
+    if (iIterations % (iResultSize - 1) != 0)
+    {
+        FPRINTE(stderr,"iResultSize is not compatible with iIterations\n");
+        return ERRVAL;
+    }
 
     //set current and best to all uniformly random parameters
-    Neighbor(&iCurEntryWindow, &iCurTrailStopWindow, &iCurStopLossWindow,
-             szCurEntryDate, szCurNoEntryDate, szCurExitDate, 6,
+    Neighbor(&nodeCur.iEntryWindow,
+             &nodeCur.iTrailStopWindow,
+             &nodeCur.iStopLossWindow,
+             nodeCur.szEntryDate,
+             nodeCur.szNoEntryDate,
+             nodeCur.szExitDate, 6,
              UNIFORM);
-    dCurProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
-                                 iCurEntryWindow, iCurTrailStopWindow,
-                                 iCurStopLossWindow, szCurEntryDate,
-                                 szCurNoEntryDate, szCurExitDate);
 
-    iBestEntryWindow = iCurEntryWindow;
-    iBestTrailStopWindow = iCurTrailStopWindow;
-    iBestStopLossWindow = iCurStopLossWindow;
-    strcpy(szBestEntryDate, szCurEntryDate);
-    strcpy(szBestNoEntryDate, szCurNoEntryDate);
-    strcpy(szBestExitDate, szCurExitDate);
-    dBestProfit = dCurProfit;
+    nodeCur.dProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
+                                      nodeCur.iEntryWindow,
+                                      nodeCur.iTrailStopWindow,
+                                      nodeCur.iStopLossWindow,
+                                      nodeCur.szEntryDate,
+                                      nodeCur.szNoEntryDate,
+                                      nodeCur.szExitDate);
+
+    memcpy(&nodeBest, &nodeCur, sizeof(node));
 
     mean = 0;
     M2 = 0;
@@ -75,24 +76,38 @@ double SimulatedAnnealing(int iIterations, char* szCommodName, int iArgsToRandom
 
     for (i = 0; i < iIterations; i++)
     {
+        if (i % iStepSize == 0)
+        {
+            dResults[i/iStepSize] =
+                tradeSystemData(szCommodName,
+                                TEST_YEARS,
+                                nodeBest.iEntryWindow,
+                                nodeBest.iTrailStopWindow,
+                                nodeBest.iStopLossWindow,
+                                nodeBest.szEntryDate,
+                                nodeBest.szNoEntryDate,
+                                nodeBest.szExitDate);
+        }
+
         //calculate a successor for current
-        iNextEntryWindow = iCurEntryWindow;
-        iNextTrailStopWindow = iCurTrailStopWindow;
-        iNextStopLossWindow = iCurStopLossWindow;
-        strcpy(szNextEntryDate,szCurEntryDate);
-        strcpy(szNextNoEntryDate,szCurNoEntryDate);
-        strcpy(szNextExitDate,szCurExitDate);
-        Neighbor(&iNextEntryWindow, &iNextTrailStopWindow, &iNextStopLossWindow,
-                 szNextEntryDate, szNextNoEntryDate, szNextExitDate,
+        memcpy(&nodeNext, &nodeCur, sizeof(node));
+        Neighbor(&nodeNext.iEntryWindow,
+                 &nodeNext.iTrailStopWindow,
+                 &nodeNext.iStopLossWindow,
+                 nodeNext.szEntryDate,
+                 nodeNext.szNoEntryDate,
+                 nodeNext.szExitDate,
                  iArgsToRandomize, distType);
-        dNextProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
-                                      iNextEntryWindow, iNextTrailStopWindow,
-                                      iNextStopLossWindow, szNextEntryDate,
-                                      szNextNoEntryDate, szNextExitDate);
-        //        printf("Next dProfit=%d\n",(int)dNextProfit);
+        nodeNext.dProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
+                                           nodeNext.iEntryWindow,
+                                           nodeNext.iTrailStopWindow,
+                                           nodeNext.iStopLossWindow,
+                                           nodeNext.szEntryDate,
+                                           nodeNext.szNoEntryDate,
+                                           nodeNext.szExitDate);
 
         //update the mean and variance using newly sampled instance
-        dDeltaE = dNextProfit - dCurProfit;
+        dDeltaE = nodeNext.dProfit - nodeCur.dProfit;
         dDeltaM = dDeltaE - mean;
         mean = mean + dDeltaM/(i+1);
         M2 = M2 + dDeltaM*(dDeltaE - mean);
@@ -102,49 +117,43 @@ double SimulatedAnnealing(int iIterations, char* szCommodName, int iArgsToRandom
         //check to see if the successor is good enough
         r = (double)random()/RAND_MAX;
 
-        /*
-        printf("dDeltaE = %d\n",(int)dDeltaE);
-        printf("mean = %d\n",(int)mean);
-        printf("sd = %d\n",(int)sqrt(var));
-        printf("p = %.3lf\n",p);
-        printf("T = %.3lf\n",CoolingFunction(i,iIterations));
-        printf("random() = %.3lf\n",r);
-        */
         if (dDeltaE >= 0 ||
             CoolingFunction(i,iIterations)*pnorm(dDeltaE,mean,sqrt(var)) > r)
         {
-            //            if(dDeltaE < 0)
-            //                printf("we took it\n");
-            iCurEntryWindow = iNextEntryWindow;
-            iCurTrailStopWindow = iNextTrailStopWindow;
-            iCurStopLossWindow = iNextStopLossWindow;
-            strcpy(szCurEntryDate,szNextEntryDate);
-            strcpy(szCurNoEntryDate,szNextNoEntryDate);
-            strcpy(szCurExitDate,szNextExitDate);
-            dCurProfit = dNextProfit;
+            memcpy(&nodeCur,&nodeNext,sizeof(node));
         }
 
         //if its the best so far, save it
-        if (dCurProfit > dBestProfit)
+        if (nodeCur.dProfit > nodeBest.dProfit)
         {
-            iBestEntryWindow = iCurEntryWindow;
-            iBestTrailStopWindow = iCurTrailStopWindow;
-            iBestStopLossWindow = iCurStopLossWindow;
-            strcpy(szCurEntryDate,szBestEntryDate);
-            strcpy(szCurNoEntryDate,szBestNoEntryDate);
-            strcpy(szCurExitDate,szBestExitDate);
-            dBestProfit = dCurProfit;
+            memcpy(&nodeBest,&nodeCur,sizeof(node));
         }
     }
-    dCurProfit = tradeSystemData(szCommodName,TEST_YEARS,
-                                 iCurEntryWindow, iCurTrailStopWindow, iCurStopLossWindow,
-                                 szCurEntryDate, szCurNoEntryDate, szCurExitDate);
 
-    return dBestProfit;
+    dResults[i/iStepSize] =
+        tradeSystemData(szCommodName,
+                        TEST_YEARS,
+                        nodeBest.iEntryWindow,
+                        nodeBest.iTrailStopWindow,
+                        nodeBest.iStopLossWindow,
+                        nodeBest.szEntryDate,
+                        nodeBest.szNoEntryDate,
+                        nodeBest.szExitDate);
+
+    printf("%d\t%d\t%d\t%s\t%s\t%s\t%.2lf\n",
+           nodeBest.iEntryWindow,
+           nodeBest.iTrailStopWindow,
+           nodeBest.iStopLossWindow,
+           nodeBest.szEntryDate,
+           nodeBest.szNoEntryDate,
+           nodeBest.szExitDate,
+           dResults[i/iStepSize]);
+
+    return 0;
 }
 
 
-/* -------------------------------- utility functions ---------------------------- */
+/* ----------------------------- utility functions -------------------------- */
 
 double StayCool(int iCurrentIteration, int iTotalIterations)
 {
