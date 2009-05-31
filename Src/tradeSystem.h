@@ -74,10 +74,14 @@ typedef struct _node
 typedef struct _experiment {
     int (*LearningFunction)(int iIterations, char* szCommodName,
                             int iArgsToRandomize, int distType,
-                            double dResults[], int iResultSize);
+                            double dResults[], int iResultSize,
+                            int iPopSize, int iOrgySize, double dMutationProb);
     int distType;
     int iArgsToChange;
     char szName[MAX_NAME_LEN];
+    int iPopSize;
+    int iOrgySize;
+    double dMutationProb;
     char szFileName[256];
 } experiment;
 
