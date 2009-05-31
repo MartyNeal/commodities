@@ -327,10 +327,12 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow,
 
     strncpy(dateCommon.szYear, dateCommon.szYMD, 4);
     strncpy(dateCommon.szMonthDay, dateCommon.szYMD+4, 4);
+    dateCommon.szYear[4] = (char)NULL;
+    dateCommon.szMonthDay[4] = (char)NULL;
 
-    strncpy(dateEntry.szMonthDay, szEntryDateMonthDay, 4);
-    strncpy(dateNoEntry.szMonthDay, szNoEntryDateMonthDay, 4);
-    strncpy(dateExit.szMonthDay, szExitDateMonthDay, 4);
+    strncpy(dateEntry.szMonthDay, szEntryDateMonthDay, 4+1);
+    strncpy(dateNoEntry.szMonthDay, szNoEntryDateMonthDay, 4+1);
+    strncpy(dateExit.szMonthDay, szExitDateMonthDay, 4+1);
 
     for(i = 0; i < iNumYears; i++)
     {
