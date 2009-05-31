@@ -18,12 +18,14 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow,
                        char* szEntryDateMonthDay, char* szNoEntryDateMonthDay,
                        char* szExitDateMonthDay);
 
-int SimulatedAnnealing(int iIterations, char* szCommodName,
-                       int iArgsToRandomize, int distType, double dResults[],
-                       int iResultSize);
+int SimulatedAnnealing(int iIterations,char* szCommodName, int iArgsToRandomize,
+                       int distType, double dResults[], int iStepSize,
+                       int iPopSize, int iOrgySize, double dMutationProb);
 
 int GeneticAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
-                     int distType, double dResults[], int iResultSize);
+                     int distType, double dResults[], int iStepSize,
+                     int iPopSize, int iOrgySize, double dMutationProb);
 
 int RandomAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
-                    int distType, double dResults[], int iResultSize);
+                    int distType, double dResults[], int iStepSize,
+                    int iPopSize, int iOrgySize, double dMutationProb);
