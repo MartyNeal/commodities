@@ -22,7 +22,7 @@ int GeneticAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
     int i,t;
     //create an initial population
     individual* indPopulation;
-    individual* indChildren = indPopulation+iPopSize;
+    individual* indChildren;
 
     if (iStepSize == 0)
     {
@@ -43,6 +43,7 @@ int GeneticAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
     }
 
     indPopulation = (individual*)malloc(iPopSize*2*sizeof(individual));
+    indChildren = indChildren + iPopSize;
 
     //fill it with random values
     for(i = 0; i < iPopSize; i++)
