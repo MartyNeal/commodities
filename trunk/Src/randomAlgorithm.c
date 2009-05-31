@@ -76,7 +76,7 @@ int RandomAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
                  nodeCur.szEntryDate,
                  nodeCur.szNoEntryDate,
                  nodeCur.szExitDate,
-                 6, UNIFORM);
+                 iArgsToRandomize, distType);
 
         nodeCur.dProfit = tradeSystemData(szCommodName, TRAIN_YEARS,
                                           nodeCur.iEntryWindow,
