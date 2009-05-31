@@ -24,30 +24,30 @@ double LinearCoolingFunction(int iCurrentIteration, int iTotalIterations);
 /* ----------------------------- Simulated Annealing ------------------------ */
 
 int SimulatedAnnealing(int iIterations,char* szCommodName, int iArgsToRandomize,
-                       int distType, double dResults[], int iResultSize)
+                       int distType, double dResults[], int iStepSize,
+                       int iPopSize, int iOrgySize, double dMutationProb)
 {
     node nodeCur, nodeNext, nodeBest;
 
-    int i, iStepSize;
+    int i;
     double (*CoolingFunction)(int, int) = &LinearCoolingFunction;
     double dDeltaE, dDeltaM, mean, var, M2, p, r;
 
-    if (iResultSize == 1)
+    if (iStepSize == 0)
     {
-        FPRINTE(stderr,"iResultSize can't be 1\n");
+        FPRINTE(stderr,"iStepSize can't be 0\n");
         return ERRVAL;
     }
 
-    if (iResultSize > iIterations + 1)
+    if (iStepSize > iIterations)
     {
-        FPRINTE(stderr,"iResultSize can't be greater than iIterations\n");
+        FPRINTE(stderr,"iStepSize can't be greater than iIterations\n");
         return ERRVAL;
     }
 
-    iStepSize = iIterations / (iResultSize - 1);
-    if (iIterations % (iResultSize - 1) != 0)
+    if (iIterations % iStepSize != 0)
     {
-        FPRINTE(stderr,"iResultSize is not compatible with iIterations\n");
+        FPRINTE(stderr,"iStepSize incompatible with iIterations\n");
         return ERRVAL;
     }
 
