@@ -327,8 +327,8 @@ double tradeSystemData(char* szName, double dPercentData, int iEntryWindow,
 
     strncpy(dateCommon.szYear, dateCommon.szYMD, 4);
     strncpy(dateCommon.szMonthDay, dateCommon.szYMD+4, 4);
-    dateCommon.szYear[4] = (char)NULL;
-    dateCommon.szMonthDay[4] = (char)NULL;
+    dateCommon.szYear[4] = (char)0;
+    dateCommon.szMonthDay[4] = (char)0;
 
     strncpy(dateEntry.szMonthDay, szEntryDateMonthDay, 4+1);
     strncpy(dateNoEntry.szMonthDay, szNoEntryDateMonthDay, 4+1);
