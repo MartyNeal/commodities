@@ -13,5 +13,8 @@ trade:  ${SOURCES}
 ptrade: ${SOURCES}
 	mpicc -Wall -o trade ${SOURCES} -lm
 
+tags:
+	rm TAGS; etags *.c *.h
+
 clean:
 	rm -f *.o *~ trade
