@@ -43,8 +43,7 @@ int GeneticAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
     }
 
     indPopulation = (individual*)malloc(iPopSize*2*sizeof(individual));
-    indChildren = indChildren + iPopSize;
-
+    indChildren = indPopulation + iPopSize;
     //fill it with random values
     for(i = 0; i < iPopSize; i++)
     {
@@ -66,6 +65,8 @@ int GeneticAlgorithm(int iIterations, char* szCommodName, int iArgsToRandomize,
                             indPopulation[i].szNoEntryDate,
                             indPopulation[i].szExitDate);
     }
+
+
 
     Quicksort(indPopulation,iPopSize,iPopSize);
 
