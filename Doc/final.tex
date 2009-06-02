@@ -295,17 +295,17 @@ each commodity.
 \subsection{Genetic Algorithm Variations}
 
 Our algorithm uses three pre-specified constants: the population size, $p$, the
-number of parents used to reproduce, $n$, and the mutation probability,
-$m$. $p$, specifies the total number of individuals at the beginning and end of
-each iteration. During an iteration, reproduction doubles the population, and
-then culling halves it. Our reproduction function takes $n$ parents, and adds
-$n$ children to the population. After reproducing, the algorithm mutates each
-new child, with probability $m$.
+number of parents used to reproduce, $n$, and the mutation probability, $m$. The
+population size, $p$, specifies the total number of individuals at the beginning
+and end of each iteration. During an iteration, reproduction doubles the
+population, and then culling halves it. Our reproduction function takes $n$
+parents, and adds $n$ children to the population. After reproducing, the
+algorithm mutates each new child, with probability $m$.
 
 We investigate the effects of these constants on the overall learning rate of
 the algorithm. We use the June crude oil commodity to experiment with specific
-values for our pre-specified constants. We consider $p$ = 30, 60 and 120
-individuals, $n$ = 2 and 6 parents, and $m$ = 0.1, 1 and 10 percent.  The
+values for our pre-specified constants. We consider $p$ = 30, 60, and 120
+individuals, $n$ = 2 and 6 parents, and $m$ = 0.1, 1, and 10 percent.  The
 mutation function is fixed to alter one attribute at random.
 
 During a single iteration, the $fitness()$ function is called once for each
@@ -317,9 +317,14 @@ comparable. The number of iterations is reduced as we increase the $p$. For $p$
 120, we run 10 iterations.
 
 In the Tables and Figures section, we present six plots of the profit earned
-versus the number of calls to the $fitness()$ function.  REWRITE ME The first
-plot compares values of $m$ and $p$, for $n$ = 2; the second plot is for $n$ =
-6.
+versus the number of calls to the $fitness()$ function.  Each plot compares
+trials with $m = $ 0.1, 1, and 10 percent, for fixed values of $n$ and $p$.  The
+trials with $n = 2$ performed consistently better than those with $n = 6$.  Of
+the trials with $n = 2$, those with $p = 30$ and $p = 60$ performed similarly;
+the trials with $p = 30$ made slightly larger profits.  Trials with $m = 10$
+percent performed the best in most cases.  Therefore, we conclude $n = 2$, $p =
+30$ and $m = 10$ percent is the best combination of values for these constants.
+We use these values for the remainder of our experiments.
 
 \subsection{Successor Function}
 
@@ -344,9 +349,16 @@ crude oil data. In order to study the learning speed for each experiment, we
 train the learner, using an increasing number of iterations, ranging from 0 to
 1200.  At each step, we record the best parameters seen thus far.  We evaluate
 the set of best parameters, using the testing data, and record the profit, for
-each step. To minimize noise, we take an average of 100 trials at each step. In
-the Tables and Figures section, we present plots of the profit earned as a
-function of the number of iterations, for each learning algorithm.
+each step. To minimize noise, we take an average of 100 trials at each step.
+
+In the Tables and Figures section, we present nine plots of the profit earned as
+a function of the number of iterations, for each learning algorithm.  Each plot
+compares values of $n$ for a fixed algorithm and distribution function.  For
+simulated annealing and for the genetic algorithm, the uniform distribution with
+$n = 1$ achieved the best results.  For the random walk, the uniform
+distribution with $n = 6$ performed slightly better than the other random walk
+trials.  Therefore, we use these distributions and values of $n$ in our
+successor functions.
 
 \subsection{Finding Optimal Parameters}
 
@@ -359,7 +371,18 @@ of parameters, using the testing data.
 In the Tables and Figures section, we present the parameters obtained from each
 of our three learning algorithms, along with Momsen's published parameter
 values, for all fourteen commodities. For each set of parameters, we report the
-profit earned after evaluating them with the testing data.
+profit earned after evaluating them with the testing data.  For all commodities
+except October Lean Hogs, at least one of our three algorithms produced more
+profitable parameters than Momsen's. Simulated annealing produced the best
+parameters for six out of the fourteen commodities.  Random walk came in at a
+close second with the best parameters for five out of the fourteen commodities.
+Genetic algorithms produced the best parameters only twice.  Momsen's parameters
+were the most profitable for one of the fourteen commodities.
+
+Over all the commodities, random walk was the most profitable algorithm making a
+total of \$618,913.30 over 160 testing years.  Simulated annealing made
+\$563,866.80, our genetic algorithm made \$482,857.00, and Momsen's parameters
+made \$133,869.60.
 
 \section{Conclusions}
 
