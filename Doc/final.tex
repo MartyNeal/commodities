@@ -1,10 +1,13 @@
 \documentclass[12pt]{article}
-\usepackage{graphicx, url}
-\usepackage{listings,color}
+\usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
 \usepackage[left=2cm,top=1.5cm,right=2.5cm,bottom=1cm]{geometry}
 \setlength{\parskip}{5mm plus5mm minus2mm}
 \setlength{\parindent}{0mm}
-
 
 \begin{document}
 
@@ -289,8 +292,7 @@ function. After determining the best set of variations for each learning
 algorithm, we use our algorithms to search for the optimal parameters for
 each commodity.
 
-\subsection{Genetic Algorithm variations}
-
+\subsection{Genetic Algorithm Variations}
 
 Our algorithm uses three pre-specified constants: the population size, $p$, the
 number of parents used to reproduce, $n$, and the mutation probability,
@@ -314,15 +316,10 @@ comparable. The number of iterations is reduced as we increase the $p$. For $p$
 = 30, we run 40 iterations, for $p$ = 60, we run 20 iterations, and for $p$ =
 120, we run 10 iterations.
 
-
-Below, we present two plots of the profit earned versus the number of calls to
-the $fitness()$ function. The first plot compares values of $m$ and $p$, for $n$
-= 2; the second plot is for $n$ = 6.
-
-
-PLOTS OF: PROFIT EARNED VS. MUTATION PROBABILITY, PROFIT EARNED VS. POPULATION
-SIZE AND PROFIT EARNED VS. REPRODUCTION FUNCTION
-
+In the Tables and Figures section, we present six plots of the profit earned
+versus the number of calls to the $fitness()$ function.  REWRITE ME The first
+plot compares values of $m$ and $p$, for $n$ = 2; the second plot is for $n$ =
+6.
 
 \subsection{Successor Function}
 
@@ -347,14 +344,9 @@ crude oil data. In order to study the learning speed for each experiment, we
 train the learner, using an increasing number of iterations, ranging from 0 to
 1200.  At each step, we record the best parameters seen thus far.  We evaluate
 the set of best parameters, using the testing data, and record the profit, for
-each step. To minimize noise, we take an average of 100 trials at each
-step. Below we present plots of the profit earned as a function of the number of
-iterations, for each learning algorithm.
-
-
-WE WILL INCLUDE THREE PLOTS OF PROFIT VS. NUMBER OF ITERATIONS, ONE FOR EACH
-LEARNING ALGORITHM. EACH PLOT WILL HAVE 9 LINES, REPRESENTING 9 DIFFERENT
-SUCCESSOR VARIATIONS FOR THAT LEARNING ALGORITHM.
+each step. To minimize noise, we take an average of 100 trials at each step. In
+the Tables and Figures section, we present plots of the profit earned as a
+function of the number of iterations, for each learning algorithm.
 
 \subsection{Finding Optimal Parameters}
 
@@ -364,153 +356,10 @@ commodities. For each commodity, we first train the learner over 300 iterations,
 recording the most profitable set of six parameters. We then evaluate this set
 of parameters, using the testing data.
 
-Below we present the parameters obtained from each of our three learning
-algorithms, along with Momsen's published parameter values, for all fourteen
-commodities. For each set of parameters, we report the profit earned after
-evaluating them with the testing data.
-
-
-NOTE: THESE TABLES WILL BE FILLED IN FOR THE FINAL DRAFT.
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  April & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Live Cattle & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 25 & 22 & 2 & 12-02 & 02-01 & 03-23 & \$4,740 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  August & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Pork Bellies & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen &  14 & 13 & 4 & 04-02 & 07-01 & 07-29 & \$30,030 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  December & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Corn & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 21 & 11 & 2 & 05-12 & 08-01 & 08-06 & \$12,412 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  December & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Wheat & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 12 & 5 & 3 & 05-20 & 08-01 & 08-06 & \$9,925 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  December  & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 12 & 12 & 5 & 05-15 & 07-01 & 08-12 & \$8,190 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  February & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 12 & 15 & 4 & 10-11 & 12-01 & 12-19 & \$11,440 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 17 & 14 & 3 & 02-24 & 04-01 & 04-20 & \$5,380 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Unleaded Gas & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 6 & 8 & 2 & 03-02 & 04-13 & 05-09 & \$13,679 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 21 & 15 & 5 & 02-28 & 05-01 & 05-27 & \$4,260 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  May & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Heating Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 23 & 9 & 2 & 02-24 & 04-01 & 04-20 & \$2,431.80 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  November & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 10 & 5 & 3 & 07-24 & 09-05 & 09-25 & \$9,150 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  November & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Heating Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen &  19 & 11 & 5 & 07-02 & 09-30 & 10-08 & \$13,981.80 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  October & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 15 & 7 & 1 & 08-29 & 09-30 & 10-01 & \$6,360 \\ \hline
-\end{tabular}
-
-\begin{tabular}{|r|l|l|l|l|l|l|l|}
-  \hline
-  September    & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
-  Orange Juice & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
-  Simulated Annealing & a & b & c & d & e & f & \$ \\ \hline
-  Genetic Algorithms & a & b & c & d & e & f & \$ \\ \hline
-  Random Walk & a & b & c & d & e & f & \$ \\ \hline
-  Momsen & 10 & 7 & 3 & 05-02 & 06-15 & 06-26 & \$1,890 \\ \hline
-\end{tabular}
+In the Tables and Figures section, we present the parameters obtained from each
+of our three learning algorithms, along with Momsen's published parameter
+values, for all fourteen commodities. For each set of parameters, we report the
+profit earned after evaluating them with the testing data.
 
 \section{Conclusions}
 
@@ -521,6 +370,209 @@ also compare the final parameters obtained for each of the learning algorithms
 to Momsen's published parameters. We hope to find more profitable parameter's
 than Momsen's.
 
+\pagebreak
+\section{Tables and Figures}
+
+\subsection{Genetic Algorithm Variations}
+
+\begin{figure}[!ht]
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen2ParentsPop120.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen6ParentsPop120.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen2ParentsPop60.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen6ParentsPop60.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen2ParentsPop30.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{Gen6ParentsPop30.eps}
+  \end{minipage}
+\end{figure}
+
+\pagebreak
+\subsection{Successor Function}
+
+\begin{figure}[!ht]
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{SimUNIFORMDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{GenUNIFORMDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{SimNORMALDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{GenNORMALDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{SimCONSTANTDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{GenCONSTANTDist.eps}
+  \end{minipage}
+\end{figure}
+\begin{figure}[!ht]
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{RanCONSTANTDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{RanNORMALDist.eps}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \includegraphics[width=7.5cm]{RanUNIFORMDist.eps}
+  \end{minipage}
+\end{figure}
+
+\pagebreak
+\subsection{Optimal Parameters}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  April & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Live Cattle & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 9 & 10 & 6 & 04-21 & 03-18 & 04-07 & \$1,110.00 \\ \hline
+  Genetic Algorithms & 45 & 31 & 39 & 03-23 & 01-22 & 02-19 & \$6,450.00 \\ \hline
+  Random Walk & 2 & 13 & 34 & 06-20 & 04-12 & 03-07 & \$10,820.00 \\ \hline
+  Momsen & 25 & 22 & 2 & 12-02 & 02-01 & 03-23 & \$4,740 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  August & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Pork Bellies & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 3 & 4 & 35 & 10-19 & 08-27 & 01-02 & \$123,150.00 \\ \hline
+  Genetic Algorithms & 7 & 3 & 39 & 04-16 & 12-29 & 05-31 & \$139,590.00 \\ \hline
+  Random Walk & 1 & 49 & 16 & 01-09 & 10-13 & 04-09 & \$271,010.00 \\ \hline
+  Momsen &  14 & 13 & 4 & 04-02 & 07-01 & 07-29 & \$30,030 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Corn & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 4 & 27 & 23 & 03-21 & 01-01 & 12-19 & \$-3,138.00 \\ \hline
+  Genetic Algorithms & 2 & 33 & 3 & 05-05 & 02-18 & 10-18 & \$97,793.50 \\ \hline
+  Random Walk & 22 & 38 & 43 & 04-30 & 04-19 & 12-19 & \$541.50 \\ \hline
+  Momsen & 21 & 11 & 2 & 05-12 & 08-01 & 08-06 & \$12,412 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Wheat & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 2 & 12 & 3 & 01-25 & 01-01 & 12-19 & \$113,381.50 \\ \hline
+  Genetic Algorithms & 17 & 12 & 44 & 06-12 & 02-21 & 07-21 & \$25,249.00 \\ \hline
+  Random Walk & 1 & 27 & 21 & 08-23 & 08-12 & 08-30 & \$60,920.50 \\ \hline
+  Momsen & 12 & 5 & 3 & 05-20 & 08-01 & 08-06 & \$9,925 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  December  & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 2 & 38 & 6 & 11-22 & 01-13 & 12-19 & \$131,680.00 \\ \hline
+  Genetic Algorithms & 9 & 16 & 3 & 06-12 & 04-27 & 10-18 & \$108,960.00 \\ \hline
+  Random Walk & 1 & 47 & 32 & 09-18 & 02-21 & 10-07 & \$62,310.00 \\ \hline
+  Momsen & 12 & 12 & 5 & 05-15 & 07-01 & 08-12 & \$8,190 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  February & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 2 & 40 & 25 & 05-30 & 03-28 & 06-24 & \$22,060.00 \\ \hline
+  Genetic Algorithms & 9 & 12 & 3 & 03-10 & 02-21 & 07-21 & \$14,360.00 \\ \hline
+  Random Walk & 1 & 46 & 17 & 08-16 & 01-30 & 08-29 & \$39,890.00 \\ \hline
+  Momsen & 12 & 15 & 4 & 10-11 & 12-01 & 12-19 & \$11,440 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 9 & 34 & 25 & 01-16 & 08-27 & 10-08 & \$16,290.00 \\ \hline
+  Genetic Algorithms & 4 & 1 & 4 & 02-11 & 09-19 & 01-06 & \$10,830.00 \\ \hline
+  Random Walk & 36 & 15 & 48 & 12-14 & 04-22 & 04-27 & \$9,390.00 \\ \hline
+  Momsen & 17 & 14 & 3 & 02-24 & 04-01 & 04-20 & \$5,380 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Unleaded Gas & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 3 & 17 & 21 & 05-31 & 04-25 & 09-24 & \$18,051.60 \\ \hline
+  Genetic Algorithms & 32 & 15 & 12 & 07-15 & 11-24 & 05-16 & \$2,767.80 \\ \hline
+  Random Walk & 31 & 49 & 31 & 07-26 & 03-18 & 05-09 & \$14,448.00 \\ \hline
+  Momsen & 6 & 8 & 2 & 03-02 & 04-13 & 05-09 & \$13,679 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  June & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 13 & 27 & 19 & 05-30 & 03-31 & 05-26 & \$13,880.00 \\ \hline
+  Genetic Algorithms & 32 & 25 & 39 & 07-15 & 05-21 & 06-01 & \$11,640.00 \\ \hline
+  Random Walk & 1 & 17 & 25 & 08-18 & 03-17 & 05-24 & \$9,570.00 \\ \hline
+  Momsen & 21 & 15 & 5 & 02-28 & 05-01 & 05-27 & \$4,260 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  May & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Heating Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 3 & 36 & 6 & 01-30 & 10-19 & 11-06 & \$14,082.60 \\ \hline
+  Genetic Algorithms & 4 & 19 & 48 & 02-05 & 12-01 & 09-26 & \$15,808.80 \\ \hline
+  Random Walk & 6 & 20 & 23 & 07-30 & 10-23 & 11-28 & \$3,570.00 \\ \hline
+  Momsen & 23 & 9 & 2 & 02-24 & 04-01 & 04-20 & \$2,431.80 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  November & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Crude Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 18 & 24 & 11 & 12-05 & 08-11 & 10-08 & \$22,140.00 \\ \hline
+  Genetic Algorithms & 27 & 23 & 8 & 12-13 & 08-31 & 10-15 & \$19,460.00 \\ \hline
+  Random Walk & 24 & 24 & 49 & 1024 & 07-28 & 10-12 & \$34,710.00 \\ \hline
+  Momsen & 10 & 5 & 3 & 07-24 & 09-05 & 09-25 & \$9,150 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  November & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Heating Oil & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 3 & 20 & 19 & 03-13 & 10-30 & 10-09 & \$32,751.60 \\ \hline
+  Genetic Algorithms & 16 & 1 & 12 & 12-13 & 09-03 & 09-29 & \$27,245.40 \\ \hline
+  Random Walk & 2 & 7 & 42 & 02-27 & 09-17 & 05-25 & \$20,785.80 \\ \hline
+  Momsen &  19 & 11 & 5 & 07-02 & 09-30 & 10-08 & \$13,981.80 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  October & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Lean Hogs & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 5 & 34 & 25 & 10-19 & 10-14 & 10-08 & \$-13,250.00 \\ \hline
+  Genetic Algorithms & 24 & 32 & 12 & 12-13 & 09-22 & 09-28 & \$5,050.00 \\ \hline
+  Random Walk & 5 & 29 & 34 & 12-19 & 09-05 & 09-23 & \$3,690.00 \\ \hline
+  Momsen & 15 & 7 & 1 & 08-29 & 09-30 & 10-01 & \$6,360 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|r|l|l|l|l|l|l|l|}
+  \hline
+  September    & \multicolumn{3}{|c|}{Channel Thresholds} & \multicolumn{3}{|c|}{Window Dates} &  \\
+  Orange Juice & Entry & Trail Stop & Stop Loss & Open & Close & Exit & Profit\\ \hline
+  Simulated Annealing & 4 & 12 & 27 & 01-30 & 01-21 & 06-19 & \$71,677.50 \\ \hline
+  Genetic Algorithms & 30 & 14 & 8 & 04-18 & 03-18 & 06-16 & \$-2,347.50 \\ \hline
+  Random Walk & 5 & 34 & 27 & 10-03 & 09-22 & 11-01 & \$77,257.50 \\ \hline
+  Momsen & 10 & 7 & 3 & 05-02 & 06-15 & 06-26 & \$1,890 \\ \hline
+\end{tabular}
 
 \bibliographystyle{plain}
 \bibliography{final}
