@@ -81,11 +81,9 @@ trading short, the channel lines are reversed.
 
 The sixth and final system parameter, the $stop\_loss\_threshold$, serves as a
 safety net to prevent large losses.  When trading short, the stop-loss is
-defined by the maximum high value over the previous q days, where q is
-strictly less than m.  When trading long, the stop-loss is defined by the
-minimum low value over the previous q days, where q is strictly less than
-n.  The trail-stop line protects profits, while the stop-loss line minimizes
-losses.
+defined by the maximum high value over the previous q days.  When trading long,
+the stop-loss is defined by the minimum low value over the previous q days.  The
+trail-stop line protects profits, while the stop-loss line minimizes losses.
 
 According to the system, if the current value of the commodity crosses the entry
 line, it indicates the beginning of a new trend, and the trade is begun.  When
@@ -96,8 +94,8 @@ However, when the system correctly predicts a long trend, the profits generated
 far outweigh small losses.
 
 Over the past thirty years, Momsen has traded this system, with outstanding
-results.  We intend to extend his work by machine learning optimal values for
-the six trading parameters.
+results.  We extend his work by machine learning optimal values for the six
+trading parameters.
 
 \section{Methods}
 
@@ -128,8 +126,8 @@ high, low, and closing values for each commodity for every trading day.
 The data set is partitioned into two sets. For each commodity, we reserve one
 third of the data points for testing; the remaining two thirds are used to train
 the system. We use the earlier years of data for training, and the more recent
-years for testing. We do not reserve any data for validation, as we do not
-intend to validate our predetermined model.
+years for testing. We do not reserve any data for validation, as we do not need
+to validate our predetermined model.
 
 \subsubsection{The Channel Breakout System}
 
@@ -167,16 +165,16 @@ trading year. When in a trade, we check every day, to determine if we should
 exit.  When not currently in a trade, we check to determine if we should enter,
 until the entry window closes. When we enter, we compute the entry price based
 on the value at which we crossed the entry channel line. The stop-loss value is
-also based on this cross-point. When we exit, we compute the exit price based on
-the value at which we crossed the closer of the trail-stop channel and the
-stop-loss value. The profit for this trade is the difference between the entry
-and exit prices.
+also calculated using this cross-point. When we exit, we compute the exit price
+based on the value at which we crossed the closer of the trail-stop channel and
+the stop-loss value. The profit for this trade is the difference between the
+entry and exit prices.
 
 \subsection{Searching the Parameter Space}
 
 Optimal parameters maximize the profit earned as a result of trading the
 system.  We approach this optimization problem using two different machine
-learning techniques: simulated annealing, and genetic algorithms.  Below we
+learning techniques: simulated annealing, and a genetic algorithm.  Below we
 present these two algorithms, along with an algorithm for a random learner,
 which we use as a baseline comparison.
 
@@ -226,14 +224,14 @@ the distribution to use.
 
 \subsubsection{Genetic Algorithm}
 
-Genetic Algorithms model evolutionary processes.  In our proposed
-implementation, a set of six system parameters represents an individual.  Many
-individuals form a population which is repeatedly bred and then culled.
-Breeding swaps random parameters from two or more parents to create children.
-Culling evaluates each individual using a $fitness()$ function, and eliminates
-unfit individuals from the population.  The $fitness()$ function returns the
-profit earned by trading the channel breakout system using the individual's six
-parameters.  We present the psuedo-code for the Genetic Algorithm below.
+Genetic Algorithms model evolutionary processes.  In our implementation, a set
+of six system parameters represents an individual.  Many individuals form a
+population which is repeatedly bred and then culled.  Breeding swaps random
+parameters from two or more parents to create children.  Culling evaluates each
+individual using a $fitness()$ function, and eliminates unfit individuals from
+the population.  The $fitness()$ function returns the profit earned by trading
+the channel breakout system using the individual's six parameters.  We present
+the psuedo-code for the Genetic Algorithm below.
 
 \vspace{10pt}
 \setlength{\parindent}{5mm}
@@ -241,7 +239,7 @@ parameters.  We present the psuedo-code for the Genetic Algorithm below.
 \indent\indent population $\leftarrow$ createPopulation(size)\\\\
 \indent \indent for t $\leftarrow$ 1 to number\_iterations\\
 \indent \indent \indent for i $\leftarrow$ 1 to size(population)\\\\
-\indent \indent \indent \indent parents $\leftarrow$ randomSubset(population, size)\\
+\indent \indent \indent \indent parents $\leftarrow$ randomSubset(population)\\
 \indent \indent \indent \indent children $\leftarrow$ reproduce(parents)\\
 \indent \indent \indent \indent children $\leftarrow$ mutate(children, n, dist\_type) with small random probability\\
 \indent \indent \indent \indent population $\leftarrow$ add(population, children)\\\\
@@ -253,10 +251,10 @@ This generic algorithm leaves a lot of room for experimentation. The initial
 population size may vary.  The probability of mutation may be changed.  The
 mutation of an attribute may be uniformly or normally distributed.  The
 $reproduce()$ function may take between two and six parents.  These parents
-randomly swap attributes to produce one or more children, which are added to
-the population.  The population is then culled, which preserves a threshold
-number of individuals, removing all others as unfit. We intend to experiment
-with many of these variations.
+randomly swap attributes to produce one or more children, which are added to the
+population.  The population is then culled, which preserves a threshold number
+of individuals, removing all others as unfit. We experiment with all of these
+variations.
 
 \subsubsection{Random Walk}
 
@@ -294,7 +292,7 @@ each commodity.
 
 \subsection{Genetic Algorithm Variations}
 
-Our algorithm uses three pre-specified constants: the population size, $p$, the
+Our genetic algorithm uses three pre-specified constants: the population size, $p$, the
 number of parents used to reproduce, $n$, and the mutation probability, $m$. The
 population size, $p$, specifies the total number of individuals at the beginning
 and end of each iteration. During an iteration, reproduction doubles the
@@ -311,10 +309,10 @@ mutation function is fixed to alter one attribute at random.
 During a single iteration, the $fitness()$ function is called once for each
 individual.  Therefore, the total number of calls to the fitness function is the
 population size multiplied by the number of iterations.  We fix the number of
-calls to the fitness function to 1200 so that the experiments are
-comparable. The number of iterations is reduced as we increase the $p$. For $p$
-= 30, we run 40 iterations, for $p$ = 60, we run 20 iterations, and for $p$ =
-120, we run 10 iterations.
+calls to the fitness function to 1200 so that the experiments are comparable.
+The number of iterations is reduced as we increase $p$. For $p$ = 30, we run 40
+iterations, for $p$ = 60, we run 20 iterations, and for $p$ = 120, we run 10
+iterations.
 
 In the Tables and Figures section, we present six plots of the profit earned
 versus the number of calls to the $fitness()$ function.  Each plot compares
@@ -322,9 +320,10 @@ trials with $m = $ 0.1, 1, and 10 percent, for fixed values of $n$ and $p$.  The
 trials with $n = 2$ performed consistently better than those with $n = 6$.  Of
 the trials with $n = 2$, those with $p = 30$ and $p = 60$ performed similarly;
 the trials with $p = 30$ made slightly larger profits.  Trials with $m = 10$
-percent performed the best in most cases.  Therefore, we conclude $n = 2$, $p =
-30$ and $m = 10$ percent is the best combination of values for these constants.
-We use these values for the remainder of our experiments.
+percent performed the best in most cases.  Therefore, we conclude that two
+parents, an initial population of thirty individuals, and a mutation rate of ten
+percent is the best combination of values for our genetic algorithm.  We use
+these values for the remainder of our experiments.
 
 \subsection{Successor Function}
 
@@ -364,14 +363,14 @@ successor functions.
 
 After determining the successor functions and genetic algorithm variations, we
 use each learning algorithm to find optimal parameters for each of the fourteen
-commodities. For each commodity, we first train the learner over 300 iterations,
-recording the most profitable set of six parameters. We then evaluate this set
-of parameters, using the testing data.
+commodities. For each commodity, we first train the learner over 1200
+iterations, recording the most profitable set of six parameters. We then
+evaluate this set of parameters, using the testing data.
 
 In the Tables and Figures section, we present the parameters obtained from each
 of our three learning algorithms, along with Momsen's published parameter
-values, for all fourteen commodities. For each set of parameters, we report the
-profit earned after evaluating them with the testing data.  For all commodities
+values, for all fourteen commodities. We report the profits earned after
+evaluating each set of parameters with the testing data.  For all commodities
 except October Lean Hogs, at least one of our three algorithms produced more
 profitable parameters than Momsen's. Simulated annealing produced the best
 parameters for six out of the fourteen commodities.  Random walk came in at a
@@ -386,12 +385,23 @@ made \$133,869.60.
 
 \section{Conclusions}
 
-We intend to compare the learning rates for each of our three learning
-algorithms. We hope to find that simulated annealing and our genetic algorithm
-learn to increase the profit, more rapidly than our random walk algorithm. We
-also compare the final parameters obtained for each of the learning algorithms
-to Momsen's published parameters. We hope to find more profitable parameter's
-than Momsen's.
+Momsen has presented a channel breakout system which provides investors with a
+guide to buying and selling commodities.  We have improved his system by using
+three machine learning algorithms to discover more profitable
+parameters. Searching for these parameters was a three step process. First, we
+experimented with various modifications to our learning algorithms, in an
+attempt to improve their learning efficiency. After determining the best set of
+modifications, we used our algorithms to search the parameter space for the most
+profitable parameters, given the training data. Finally, we evaluated the
+resulting parameters, using the testing data.
+
+While we have no guarantee that our learning algorithms produced the best
+possible parameters, our parameters were more profitable than Momsen's, for all
+but one of the fourteen commodities.  Our parameters made, on average, four
+times the profit that Momsen's made.  In the future, we intend to continue
+searching for optimal parameters.  Because our random walk algorithm performed
+unexpectedly well, we would like to try a pure hill climbing algorithm with
+random restarts.
 
 \pagebreak
 \section{Tables and Figures}
@@ -464,7 +474,7 @@ than Momsen's.
   Simulated Annealing & 9 & 10 & 6 & 04-21 & 03-18 & 04-07 & \$1,110.00 \\ \hline
   Genetic Algorithms & 45 & 31 & 39 & 03-23 & 01-22 & 02-19 & \$6,450.00 \\ \hline
   Random Walk & 2 & 13 & 34 & 06-20 & 04-12 & 03-07 & \$10,820.00 \\ \hline
-  Momsen & 25 & 22 & 2 & 12-02 & 02-01 & 03-23 & \$4,740 \\ \hline
+  Momsen & 25 & 22 & 2 & 12-02 & 02-01 & 03-23 & \$4,740.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -474,7 +484,7 @@ than Momsen's.
   Simulated Annealing & 3 & 4 & 35 & 10-19 & 08-27 & 01-02 & \$123,150.00 \\ \hline
   Genetic Algorithms & 7 & 3 & 39 & 04-16 & 12-29 & 05-31 & \$139,590.00 \\ \hline
   Random Walk & 1 & 49 & 16 & 01-09 & 10-13 & 04-09 & \$271,010.00 \\ \hline
-  Momsen &  14 & 13 & 4 & 04-02 & 07-01 & 07-29 & \$30,030 \\ \hline
+  Momsen &  14 & 13 & 4 & 04-02 & 07-01 & 07-29 & \$30,030.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -484,7 +494,7 @@ than Momsen's.
   Simulated Annealing & 4 & 27 & 23 & 03-21 & 01-01 & 12-19 & \$-3,138.00 \\ \hline
   Genetic Algorithms & 2 & 33 & 3 & 05-05 & 02-18 & 10-18 & \$97,793.50 \\ \hline
   Random Walk & 22 & 38 & 43 & 04-30 & 04-19 & 12-19 & \$541.50 \\ \hline
-  Momsen & 21 & 11 & 2 & 05-12 & 08-01 & 08-06 & \$12,412 \\ \hline
+  Momsen & 21 & 11 & 2 & 05-12 & 08-01 & 08-06 & \$12,412.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -494,7 +504,7 @@ than Momsen's.
   Simulated Annealing & 2 & 12 & 3 & 01-25 & 01-01 & 12-19 & \$113,381.50 \\ \hline
   Genetic Algorithms & 17 & 12 & 44 & 06-12 & 02-21 & 07-21 & \$25,249.00 \\ \hline
   Random Walk & 1 & 27 & 21 & 08-23 & 08-12 & 08-30 & \$60,920.50 \\ \hline
-  Momsen & 12 & 5 & 3 & 05-20 & 08-01 & 08-06 & \$9,925 \\ \hline
+  Momsen & 12 & 5 & 3 & 05-20 & 08-01 & 08-06 & \$9,925.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -504,7 +514,7 @@ than Momsen's.
   Simulated Annealing & 2 & 38 & 6 & 11-22 & 01-13 & 12-19 & \$131,680.00 \\ \hline
   Genetic Algorithms & 9 & 16 & 3 & 06-12 & 04-27 & 10-18 & \$108,960.00 \\ \hline
   Random Walk & 1 & 47 & 32 & 09-18 & 02-21 & 10-07 & \$62,310.00 \\ \hline
-  Momsen & 12 & 12 & 5 & 05-15 & 07-01 & 08-12 & \$8,190 \\ \hline
+  Momsen & 12 & 12 & 5 & 05-15 & 07-01 & 08-12 & \$8,190.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -514,7 +524,7 @@ than Momsen's.
   Simulated Annealing & 2 & 40 & 25 & 05-30 & 03-28 & 06-24 & \$22,060.00 \\ \hline
   Genetic Algorithms & 9 & 12 & 3 & 03-10 & 02-21 & 07-21 & \$14,360.00 \\ \hline
   Random Walk & 1 & 46 & 17 & 08-16 & 01-30 & 08-29 & \$39,890.00 \\ \hline
-  Momsen & 12 & 15 & 4 & 10-11 & 12-01 & 12-19 & \$11,440 \\ \hline
+  Momsen & 12 & 15 & 4 & 10-11 & 12-01 & 12-19 & \$11,440.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -524,7 +534,7 @@ than Momsen's.
   Simulated Annealing & 9 & 34 & 25 & 01-16 & 08-27 & 10-08 & \$16,290.00 \\ \hline
   Genetic Algorithms & 4 & 1 & 4 & 02-11 & 09-19 & 01-06 & \$10,830.00 \\ \hline
   Random Walk & 36 & 15 & 48 & 12-14 & 04-22 & 04-27 & \$9,390.00 \\ \hline
-  Momsen & 17 & 14 & 3 & 02-24 & 04-01 & 04-20 & \$5,380 \\ \hline
+  Momsen & 17 & 14 & 3 & 02-24 & 04-01 & 04-20 & \$5,380.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -534,7 +544,7 @@ than Momsen's.
   Simulated Annealing & 3 & 17 & 21 & 05-31 & 04-25 & 09-24 & \$18,051.60 \\ \hline
   Genetic Algorithms & 32 & 15 & 12 & 07-15 & 11-24 & 05-16 & \$2,767.80 \\ \hline
   Random Walk & 31 & 49 & 31 & 07-26 & 03-18 & 05-09 & \$14,448.00 \\ \hline
-  Momsen & 6 & 8 & 2 & 03-02 & 04-13 & 05-09 & \$13,679 \\ \hline
+  Momsen & 6 & 8 & 2 & 03-02 & 04-13 & 05-09 & \$13,679.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -544,7 +554,7 @@ than Momsen's.
   Simulated Annealing & 13 & 27 & 19 & 05-30 & 03-31 & 05-26 & \$13,880.00 \\ \hline
   Genetic Algorithms & 32 & 25 & 39 & 07-15 & 05-21 & 06-01 & \$11,640.00 \\ \hline
   Random Walk & 1 & 17 & 25 & 08-18 & 03-17 & 05-24 & \$9,570.00 \\ \hline
-  Momsen & 21 & 15 & 5 & 02-28 & 05-01 & 05-27 & \$4,260 \\ \hline
+  Momsen & 21 & 15 & 5 & 02-28 & 05-01 & 05-27 & \$4,260.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -564,7 +574,7 @@ than Momsen's.
   Simulated Annealing & 18 & 24 & 11 & 12-05 & 08-11 & 10-08 & \$22,140.00 \\ \hline
   Genetic Algorithms & 27 & 23 & 8 & 12-13 & 08-31 & 10-15 & \$19,460.00 \\ \hline
   Random Walk & 24 & 24 & 49 & 1024 & 07-28 & 10-12 & \$34,710.00 \\ \hline
-  Momsen & 10 & 5 & 3 & 07-24 & 09-05 & 09-25 & \$9,150 \\ \hline
+  Momsen & 10 & 5 & 3 & 07-24 & 09-05 & 09-25 & \$9,150.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -584,7 +594,7 @@ than Momsen's.
   Simulated Annealing & 5 & 34 & 25 & 10-19 & 10-14 & 10-08 & \$-13,250.00 \\ \hline
   Genetic Algorithms & 24 & 32 & 12 & 12-13 & 09-22 & 09-28 & \$5,050.00 \\ \hline
   Random Walk & 5 & 29 & 34 & 12-19 & 09-05 & 09-23 & \$3,690.00 \\ \hline
-  Momsen & 15 & 7 & 1 & 08-29 & 09-30 & 10-01 & \$6,360 \\ \hline
+  Momsen & 15 & 7 & 1 & 08-29 & 09-30 & 10-01 & \$6,360.00 \\ \hline
 \end{tabular}
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
@@ -594,7 +604,7 @@ than Momsen's.
   Simulated Annealing & 4 & 12 & 27 & 01-30 & 01-21 & 06-19 & \$71,677.50 \\ \hline
   Genetic Algorithms & 30 & 14 & 8 & 04-18 & 03-18 & 06-16 & \$-2,347.50 \\ \hline
   Random Walk & 5 & 34 & 27 & 10-03 & 09-22 & 11-01 & \$77,257.50 \\ \hline
-  Momsen & 10 & 7 & 3 & 05-02 & 06-15 & 06-26 & \$1,890 \\ \hline
+  Momsen & 10 & 7 & 3 & 05-02 & 06-15 & 06-26 & \$1,890.00 \\ \hline
 \end{tabular}
 
 \bibliographystyle{plain}
