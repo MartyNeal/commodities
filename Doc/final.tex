@@ -5,6 +5,7 @@
 \usepackage{url}
 \usepackage{listings}
 \usepackage{color}
+\usepackage[scriptsize]{caption}
 \usepackage[left=2cm,top=1.5cm,right=2.5cm,bottom=1cm]{geometry}
 \setlength{\parskip}{5mm plus5mm minus2mm}
 \setlength{\parindent}{0mm}
@@ -26,7 +27,7 @@ farmer can sell a futures contract on his crop, months or even years in advance
 of the harvest, guaranteeing the price he will recieve at harvest time. A
 grocery chain can buy the contract, with the confidence that the price will not
 go up when the farmer delivers. Futures contracts protect farmers and buyers
-from unexpected price changes.
+from unexpected price changes \cite{Wikipedia}.
 
 Investors can also buy and sell the futures contracts, attempting to capitalize
 on increases and decreases in price. If an investor expects an increase in the
@@ -43,13 +44,13 @@ price has increased above the minimum. Investors are left guessing as to
 whether the price will continue to increase, or immediately begin decreasing
 again. Guessing often proves to be unprofitable.
 
-Momsen\cite{Momsen} describes an automated trading system that attempts to predict trends in
-commodity prices, providing the investor with a guide to buying and selling.
-Momsen defines a pair of channel lines above and below the commodity's price.
-The lines are defined using the price history. When the commodity's value
-undergoes a change in trend, it crosses one of the channel lines, alerting the
-investor to the change. At this point, the investor can decide to buy or
-sell, appropriately.
+Momsen \cite{Momsen} describes an automated trading system that attempts to
+predict trends in commodity prices, providing the investor with a guide to
+buying and selling.  Momsen defines a pair of channel lines above and below the
+commodity's price.  The lines are defined using the price history. When the
+commodity's value undergoes a change in trend, it crosses one of the channel
+lines, alerting the investor to the change. At this point, the investor can
+decide to buy or sell, appropriately.
 
 Momsen's channel breakout system relies on a set of six parameters to define
 the channel lines and date ranges between which an investor may buy and sell.
@@ -94,7 +95,7 @@ However, when the system correctly predicts a long trend, the profits generated
 far outweigh small losses.
 
 Over the past thirty years, Momsen has traded this system, with outstanding
-results.  We extend his work by machine learning optimal values for the six
+results \cite{Momsen}.  We extend his work by machine learning optimal values for the six
 trading parameters.
 
 \section{Methods}
@@ -124,10 +125,9 @@ Some commodities are traded during multiple seasons.  The data includes open,
 high, low, and closing values for each commodity for every trading day.
 
 The data set is partitioned into two sets. For each commodity, we reserve one
-third of the data points for testing; the remaining two thirds are used to train
+third of the data points for validation; the remaining two thirds are used to train
 the system. We use the earlier years of data for training, and the more recent
-years for testing. We do not reserve any data for validation, as we do not need
-to validate our predetermined model.
+years for validation. We do not reserve any data for testing.
 
 \subsubsection{The Channel Breakout System}
 
@@ -185,7 +185,7 @@ heuristic algorithms.  Hill climbing algorithms learn quickly, but they
 generally only find local maxima, because they never move downhill. Random
 walks are guaranteed to find the global maximum but take far too long to do so.
 Simulated Annealing combines these approaches, yielding both efficiency and
-completeness.  We present the psuedo-code for the Simulated Annealing algorithm
+completeness \cite{RussellNorvig}.  We present the psuedo-code for the Simulated Annealing algorithm
 below.
 
 \vspace{25pt}
@@ -230,7 +230,7 @@ population which is repeatedly bred and then culled.  Breeding swaps random
 parameters from two or more parents to create children.  Culling evaluates each
 individual using a $fitness()$ function, and eliminates unfit individuals from
 the population.  The $fitness()$ function returns the profit earned by trading
-the channel breakout system using the individual's six parameters.  We present
+the channel breakout system using the individual's six parameters \cite{Mitchell,RussellNorvig}.  We present
 the psuedo-code for the Genetic Algorithm below.
 
 \vspace{10pt}
@@ -306,13 +306,19 @@ values for our pre-specified constants. We consider $p$ = 30, 60, and 120
 individuals, $n$ = 2 and 6 parents, and $m$ = 0.1, 1, and 10 percent.  The
 mutation function is fixed to alter one attribute at random.
 
+To study the learning speed for each experiment, we train the learner, using an
+increasing number of iterations.  At each step, we record the best parameters
+seen thus far.  After training, we evaluate the set of best parameters from each
+step, using the validation data, and record the profit. To minimize noise, we
+take an average of 100 trials at every step.
+
 During a single iteration, the $fitness()$ function is called once for each
 individual.  Therefore, the total number of calls to the fitness function is the
 population size multiplied by the number of iterations.  We fix the number of
-calls to the fitness function to 1200 so that the experiments are comparable.
-The number of iterations is reduced as we increase $p$. For $p$ = 30, we run 40
-iterations, for $p$ = 60, we run 20 iterations, and for $p$ = 120, we run 10
-iterations.
+calls to the fitness function to 1200 so that the experiments are
+comparable. The number of iterations is reduced as we increase $p$. For $p$ =
+30, we run 40 iterations, for $p$ = 60, we run 20 iterations, and for $p$ = 120,
+we run 10 iterations.
 
 In the Tables and Figures section, we present six plots of the profit earned
 versus the number of calls to the $fitness()$ function.  Each plot compares
@@ -347,7 +353,7 @@ experiment, we train the learner, using the earliest two thirds of the June
 crude oil data. In order to study the learning speed for each experiment, we
 train the learner, using an increasing number of iterations, ranging from 0 to
 1200.  At each step, we record the best parameters seen thus far.  We evaluate
-the set of best parameters, using the testing data, and record the profit, for
+the set of best parameters, using the validation data, and record the profit, for
 each step. To minimize noise, we take an average of 100 trials at each step.
 
 In the Tables and Figures section, we present nine plots of the profit earned as
@@ -365,12 +371,12 @@ After determining the successor functions and genetic algorithm variations, we
 use each learning algorithm to find optimal parameters for each of the fourteen
 commodities. For each commodity, we first train the learner over 1200
 iterations, recording the most profitable set of six parameters. We then
-evaluate this set of parameters, using the testing data.
+evaluate this set of parameters, using the validation data.
 
 In the Tables and Figures section, we present the parameters obtained from each
 of our three learning algorithms, along with Momsen's published parameter
 values, for all fourteen commodities. We report the profits earned after
-evaluating each set of parameters with the testing data.  For all commodities
+evaluating each set of parameters with the validation data.  For all commodities
 except October Lean Hogs, at least one of our three algorithms produced more
 profitable parameters than Momsen's. Simulated annealing produced the best
 parameters for six out of the fourteen commodities.  Random walk came in at a
@@ -379,9 +385,10 @@ Genetic algorithms produced the best parameters only twice.  Momsen's parameters
 were the most profitable for one of the fourteen commodities.
 
 Over all the commodities, random walk was the most profitable algorithm making a
-total of \$618,913.30 over 160 testing years.  Simulated annealing made
+total of \$618,913.30 over 160 validation years.  Simulated annealing made
 \$563,866.80, our genetic algorithm made \$482,857.00, and Momsen's parameters
-made \$133,869.60.
+made \$133,869.60. Our algorithms produced parameters that made, on average,
+four times the profit that Momsen's parameters made.
 
 \section{Conclusions}
 
@@ -393,7 +400,7 @@ experimented with various modifications to our learning algorithms, in an
 attempt to improve their learning efficiency. After determining the best set of
 modifications, we used our algorithms to search the parameter space for the most
 profitable parameters, given the training data. Finally, we evaluated the
-resulting parameters, using the testing data.
+resulting parameters, using the validation data.
 
 While we have no guarantee that our learning algorithms produced the best
 possible parameters, our parameters were more profitable than Momsen's, for all
@@ -405,67 +412,129 @@ random restarts.
 
 \pagebreak
 \section{Tables and Figures}
-
+\vspace{-16pt}
 \subsection{Genetic Algorithm Variations}
 
 \begin{figure}[!ht]
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen2ParentsPop120.eps}
+    \center
+    \includegraphics[width=6.3cm]{Gen2ParentsPop120.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 120, a
+      uniform distribution, and two parents.}
+  \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=6.3cm]{Gen6ParentsPop120.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 120, a
+      uniform distribution, and six parents.}
   \end{minipage}
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen6ParentsPop120.eps}
+    \center
+    \includegraphics[width=6.3cm]{Gen2ParentsPop60.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 60, a
+      uniform distribution, and two parents.}
+  \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=6.3cm]{Gen6ParentsPop60.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 60, a
+      uniform distribution, and six parents.}
   \end{minipage}
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen2ParentsPop60.eps}
+    \center
+    \includegraphics[width=6.3cm]{Gen2ParentsPop30.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 30, a
+      uniform distribution, and two parents.}
   \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen6ParentsPop60.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen2ParentsPop30.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{Gen6ParentsPop30.eps}
+    \center
+    \includegraphics[width=6.3cm]{Gen6ParentsPop30.eps}
+    \caption{The relative learning speeds using the mutation rates of 0.1,
+      1, and 10 percent for genetic algorithms with a population size of 30, a
+      uniform distribution, and six parents.}
   \end{minipage}
 \end{figure}
 
 \pagebreak
 \subsection{Successor Function}
-
 \begin{figure}[!ht]
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{SimUNIFORMDist.eps}
+    \center
+    \includegraphics[width=7.0cm]{SimUNIFORMDist.eps}
+    \caption{The relative learning speeds of simulated annealing using a uniform
+      distribution with $n$ = 1, 3, and 6.}
+  \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=7.0cm]{GenUNIFORMDist.eps}
+    \caption{The relative learning speeds of genetic algorithms using a uniform
+      distribution with $n$ = 1, 3, and 6.}
   \end{minipage}
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{GenUNIFORMDist.eps}
+    \center
+    \includegraphics[width=7.0cm]{SimNORMALDist.eps}
+    \caption{The relative learning speeds of simulated annealing using a normal
+      distribution with $n$ = 1, 3, and 6.}
+  \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=7.0cm]{GenNORMALDist.eps}
+    \caption{The relative learning speeds of genetic algorithms using a normal
+      distribution with $n$ = 1, 3, and 6.}
   \end{minipage}
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{SimNORMALDist.eps}
+    \center
+    \includegraphics[width=7.0cm]{SimCONSTANTDist.eps}
+    \caption{The relative learning speeds of simulated annealing using a
+      constant distribution with $n$ = 1, 3, and 6.}
   \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
   \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{GenNORMALDist.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{SimCONSTANTDist.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{GenCONSTANTDist.eps}
+    \center
+    \includegraphics[width=7.0cm]{GenCONSTANTDist.eps}
+    \caption{The relative learning speeds of genetic algorithms using a constant
+      distribution with $n$ = 1, 3, and 6.}
   \end{minipage}
 \end{figure}
-\begin{figure}[!ht]
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{RanCONSTANTDist.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{RanNORMALDist.eps}
-  \end{minipage}
-  \begin{minipage}[b]{0.5\linewidth}
-    \includegraphics[width=7.5cm]{RanUNIFORMDist.eps}
-  \end{minipage}
-\end{figure}
-
 \pagebreak
+\begin{figure}[!ht]
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=6.4cm]{RanCONSTANTDist.eps}
+    \caption{The relative learning speeds of random algorithms using a constant
+      distribution with $n$ = 1, 3, and 6.}
+  \end{minipage}
+\hspace{0.5cm} % To get a little bit of space between the figures
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=6.4cm]{RanNORMALDist.eps}
+    \caption{The relative learning speeds of random algorithms using a normal
+      distribution with $n$ = 1, 3, and 6.}
+  \end{minipage}
+  \begin{minipage}[b]{0.5\linewidth}
+    \center
+    \includegraphics[width=6.4cm]{RanUNIFORMDist.eps}
+    \caption{The relative learning speeds of random algorithms using a uniform
+      distribution with $n$ = 1, 3, and 6.}
+  \end{minipage}
+\end{figure}
+
 \subsection{Optimal Parameters}
+
+Here, we present the parameters obtained from our three learning algorithms,
+along with Momsen's parameter values, for all fourteen commodities. We report
+the profits earned after evaluating each set of parameters with the validation
+data.
 
 \begin{tabular}{|r|l|l|l|l|l|l|l|}
   \hline
